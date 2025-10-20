@@ -1,9 +1,23 @@
 .profile-container {
-  padding: 2rem 0;
+  /* center the page content like homepage */
+  max-width: 1100px;
+  margin: 0 auto; /* center horizontally */
+  padding: 2rem 1rem; /* responsive padding */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
 }
 
 .profile-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  text-align: center; /* center header on small screens */
+}
+
+@media (min-width: 640px) {
+  .profile-header {
+    text-align: left; /* left align on larger screens */
+  }
 }
 
 .profile-header h1 {
@@ -18,32 +32,42 @@
   color: #9090a8;
 }
 
+/* Card holds the profile form/content and fills the centered container */
 .profile-card {
   background: #16162a;
   border: 1px solid #2a2a3e;
   border-radius: 0.5rem;
   padding: 2rem;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(8, 8, 12, 0.45);
 }
 
+/* Form layout */
 .profile-form {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  width: 100%;
 }
 
+/* Avatar section - centered on small screens, horizontal on larger */
 .profile-avatar-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  width: 100%;
 }
 
 @media (min-width: 640px) {
   .profile-avatar-section {
     flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
   }
 }
 
+/* Avatar */
 .profile-avatar {
   width: 6rem;
   height: 6rem;
@@ -53,6 +77,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .profile-avatar img {
@@ -67,6 +92,7 @@
   color: #e8e8f0;
 }
 
+/* Avatar info - centered on small screens, left on larger */
 .profile-avatar-info {
   text-align: center;
 }
@@ -88,16 +114,19 @@
   color: #9090a8;
 }
 
+/* Fields take full width inside the card */
 .profile-fields {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .profile-field {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .profile-field label {
@@ -126,10 +155,19 @@
   color: #9090a8;
 }
 
+/* Actions: center on small screens, align left on larger screens */
 .profile-actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .profile-actions {
+    justify-content: flex-start;
+  }
 }
 
 .profile-save-button {
@@ -142,7 +180,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }

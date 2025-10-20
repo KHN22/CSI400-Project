@@ -151,3 +151,23 @@ a {
 button {
   font-family: inherit;
 }
+
+/* add to Frontend/styles/globals.css (or the globals file that layout.jsx imports) */
+.container {
+  max-width: 80rem; /* keeps content narrow like home */
+  margin: 0 auto; /* center horizontally */
+  padding: 2rem 1rem; /* responsive padding */
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 2rem 2rem;
+  }
+}
