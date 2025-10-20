@@ -1,0 +1,248 @@
+.payment-container {
+  padding: 2rem 0;
+}
+
+.payment-header {
+  margin-bottom: 1.5rem;
+}
+
+.payment-header h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #e8e8f0;
+}
+
+.payment-header p {
+  color: #9090a8;
+}
+
+.payment-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .payment-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.qr-card {
+  background: #16162a;
+  border: 1px solid #2a2a3e;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-placeholder {
+  width: 16rem;
+  height: 16rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #2a2a3e;
+  border-radius: 0.5rem;
+  background: #1a1a2e;
+  margin-bottom: 1rem;
+}
+
+.qr-content {
+  text-align: center;
+}
+
+.qr-content svg {
+  width: 4rem;
+  height: 4rem;
+  color: #9090a8;
+  margin: 0 auto 0.5rem;
+}
+
+.qr-content p {
+  font-size: 0.875rem;
+  color: #9090a8;
+}
+
+.qr-amount {
+  width: 100%;
+  text-align: center;
+}
+
+.qr-amount-label {
+  font-size: 0.875rem;
+  color: #9090a8;
+  margin-bottom: 0.5rem;
+}
+
+.qr-amount-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #6366f1;
+}
+
+.payment-summary-card {
+  background: #16162a;
+  border: 1px solid #2a2a3e;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.payment-summary-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #e8e8f0;
+}
+
+.payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.payment-label {
+  color: #9090a8;
+}
+
+.payment-value {
+  font-weight: 500;
+  color: #e8e8f0;
+}
+
+.payment-total {
+  border-top: 1px solid #2a2a3e;
+  padding-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.payment-total-amount {
+  color: #6366f1;
+}
+
+.payment-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.payment-button:hover:not(:disabled) {
+  background: #5558e3;
+}
+
+.payment-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.payment-note {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9090a8;
+}
+
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.success-icon {
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(99, 102, 241, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.success-icon svg {
+  width: 3rem;
+  height: 3rem;
+  color: #6366f1;
+}
+
+.success-container h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #e8e8f0;
+}
+
+.success-container > p {
+  font-size: 1.125rem;
+  color: #9090a8;
+  margin-bottom: 2rem;
+}
+
+.success-details-card {
+  background: #16162a;
+  border: 1px solid #2a2a3e;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 28rem;
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.success-details-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #e8e8f0;
+}
+
+.success-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.success-details-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.success-details-total {
+  margin-top: 1rem;
+  border-top: 1px solid #2a2a3e;
+  padding-top: 0.5rem;
+  font-size: 1rem;
+}
+
+.success-details-total .payment-total-amount {
+  font-weight: 700;
+}
