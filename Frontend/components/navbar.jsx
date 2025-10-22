@@ -22,6 +22,9 @@ export function Navbar() {
             <Link href="/profile" className="navbar-link">
               Profile
             </Link>
+            <Link href="/login" className="navbar-link">
+              Login/register
+            </Link>
           </div>
         </div>
       </div>
