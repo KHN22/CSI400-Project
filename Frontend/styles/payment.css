@@ -10,93 +10,110 @@
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #e8e8f0;
+  color: #cbd5e1; /* less bright than pure white */
 }
 
 .payment-header p {
-  color: #9090a8;
+  color: #94a3b8; /* muted paragraph color */
 }
 
+/* grid: QR column flexible, summary ~420px */
 .payment-grid {
   display: grid;
-  gap: 1.5rem;
-  grid-template-columns: 1fr;
+  gap: 1rem;
+  grid-template-columns: minmax(420px, 1fr) 420px;
+  align-items: start;
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 1023px) {
   .payment-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 }
 
-.qr-card {
-  background: #16162a;
-  border: 1px solid #2a2a3e;
-  border-radius: 0.5rem;
-  padding: 2rem;
+/* Card base (both QR and summary share same dark theme) */
+.qr-card,
+.payment-summary-card {
+  background: #16162A; /* darker base */
+  border: 1px solid #0f1720;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  gap: 1rem;
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 480px; /* slightly lower maximum height */
+  overflow: hidden;
 }
 
+/* summary-specific tweaks */
+.payment-summary-card {
+  padding: 1.5rem;
+}
+
+/* inner framed placeholder that holds the QR image */
 .qr-placeholder {
-  width: 16rem;
-  height: 16rem;
+  width: 100%;
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #2a2a3e;
+  position: relative;
+  padding: 1rem;
   border-radius: 0.5rem;
-  background: #1a1a2e;
-  margin-bottom: 1rem;
+  background: linear-gradient(180deg,#071018 0%,#0b131d 100%);
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid #0e1820; /* subtle inner frame */
 }
 
-.qr-content {
-  text-align: center;
+/* svg QR fills the placeholder with margin */
+.qr-mock {
+  width: 92%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+  background: #071018; /* dark base inside SVG area */
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #08121a;
 }
 
-.qr-content svg {
-  width: 4rem;
-  height: 4rem;
-  color: #9090a8;
-  margin: 0 auto 0.5rem;
-}
+/* override inline svg fills so QR modules contrast but remain muted */
+.qr-mock rect[fill="#fff"] { fill: #071018 !important; } /* background -> dark */
+.qr-mock rect[fill="#111"] { fill: #cbd5e1 !important; } /* main modules -> lighter muted */
+.qr-mock rect[fill="#333"] { fill: #9ca3af !important; } /* secondary modules -> mid-muted */
 
-.qr-content p {
-  font-size: 0.875rem;
-  color: #9090a8;
-}
-
-.qr-amount {
+/* amount placed in outer area of qr-card under the placeholder */
+.qr-amount.outer-amount {
   width: 100%;
   text-align: center;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: linear-gradient(180deg,#06101a 0%, #08121a 100%);
+  border: 1px solid rgba(255,255,255,0.02);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.25);
+  color: #888585;
 }
 
 .qr-amount-label {
   font-size: 0.875rem;
-  color: #9090a8;
-  margin-bottom: 0.5rem;
+  color: #59595a; /* muted label */
+  margin-bottom: 6px;
 }
 
 .qr-amount-value {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #6366f1;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #717479; /* brighter than background but not pure white */
 }
 
-.payment-summary-card {
-  background: #16162a;
-  border: 1px solid #2a2a3e;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-}
-
+/* payment summary styles */
 .payment-summary-card h2 {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #e8e8f0;
+  color: #cbd5e1;
 }
 
 .payment-details {
@@ -104,6 +121,7 @@
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
+  color: #9fb0c6;
 }
 
 .payment-row {
@@ -113,16 +131,16 @@
 }
 
 .payment-label {
-  color: #9090a8;
+  color: #8f9aa6;
 }
 
 .payment-value {
   font-weight: 500;
-  color: #e8e8f0;
+  color: #cfe0ff; /* slightly brighter for values */
 }
 
 .payment-total {
-  border-top: 1px solid #2a2a3e;
+  border-top: 1px solid #0e1820;
   padding-top: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -135,14 +153,14 @@
 }
 
 .payment-total-amount {
-  color: #6366f1;
+  color: #cfe0ff;
 }
 
 .payment-button {
   width: 100%;
   padding: 0.75rem 1.5rem;
-  background: #6366f1;
-  color: white;
+  background: #4758d8; /* a bit more muted than bright purple */
+  color: #e6eefc;
   border: none;
   border-radius: 0.5rem;
   font-size: 1rem;
@@ -152,11 +170,11 @@
 }
 
 .payment-button:hover:not(:disabled) {
-  background: #5558e3;
+  background: #3848bf;
 }
 
 .payment-button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -164,16 +182,12 @@
   margin-top: 1rem;
   text-align: center;
   font-size: 0.75rem;
-  color: #9090a8;
+  color: #8f9aa6;
 }
 
+/* success/simple cards */
 .success-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 0;
-  text-align: center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 0;text-align:center;
 }
 
 .success-icon {
@@ -183,66 +197,32 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(71,88,216,0.06);
   margin-bottom: 1.5rem;
 }
 
 .success-icon svg {
   width: 3rem;
   height: 3rem;
-  color: #6366f1;
+  color: #4758d8;
 }
 
 .success-container h1 {
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #e8e8f0;
+  color: #cbd5e1;
 }
 
 .success-container > p {
   font-size: 1.125rem;
-  color: #9090a8;
+  color: #9aa6b6;
   margin-bottom: 2rem;
 }
 
-.success-details-card {
-  background: #16162a;
-  border: 1px solid #2a2a3e;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 28rem;
-  text-align: left;
-  margin-bottom: 2rem;
-}
-
-.success-details-card h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #e8e8f0;
-}
-
-.success-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.success-details-row {
-  display: flex;
-  justify-content: space-between;
-}
-
-.success-details-total {
-  margin-top: 1rem;
-  border-top: 1px solid #2a2a3e;
-  padding-top: 0.5rem;
-  font-size: 1rem;
-}
-
-.success-details-total .payment-total-amount {
-  font-weight: 700;
+/* compact QR section fallback for small screens */
+@media (max-width: 640px) {
+  .qr-mock { width: 84%; }
+  .qr-amount.outer-amount { padding: 10px; font-size: 0.95rem; }
+  .payment-grid { gap: 1rem; grid-template-columns: 1fr; }
 }

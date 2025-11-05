@@ -3,18 +3,36 @@ import { mockMovies, mockBookings, mockUser } from "./mock-data"
 // Simulated API delay
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// Movies API
+const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+
 export const moviesApi = {
   getAll: async () => {
-    await delay(500)
-    return mockMovies
+    const res = await fetch(`${BACKEND_BASE}/api/movies`, { cache: "no-store" });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => null);
+      throw new Error(`moviesApi.getAll failed ${res.status}: ${txt}`);
+    }
+    const d = await res.json().catch(() => null);
+    // accept either array or { movies: [...] }
+    return Array.isArray(d) ? d : (d?.movies || []);
   },
 
   getById: async (id) => {
-    await delay(300)
-    return mockMovies.find((movie) => movie.id === id)
+    if (!id) return null;
+    const res = await fetch(`${BACKEND_BASE}/api/movies/${id}`, { cache: "no-store" });
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      if (res.status === 401) { 
+        console.warn(`moviesApi.getById: 401 for id=${id}`);
+        return null;
+      }
+      const txt = await res.text().catch(() => null);
+      throw new Error(`moviesApi.getById failed ${res.status}: ${txt}`);
+    }
+    const d = await res.json().catch(() => null);
+    return d.movie || d || null;
   },
-}
+};
 
 // Bookings API
 export const bookingsApi = {

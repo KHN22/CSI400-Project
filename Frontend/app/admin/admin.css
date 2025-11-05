@@ -1,0 +1,21 @@
+/* ...existing code... */
+
+.form-group input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.movie-item .movie-info p {
+  margin: 4px 0;
+  color: #666;
+}
+
+.movie-item .movie-info p:has(.price) {
+  color: #059669;
+  font-weight: 600;
+}
+
+/* ...existing code... */

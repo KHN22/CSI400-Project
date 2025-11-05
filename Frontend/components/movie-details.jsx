@@ -1,79 +1,78 @@
-"use client"
+"use client";
+import React from "react";
+import { useRouter } from "next/navigation";
+import "../styles/movie-details.css";
 
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { Star, Clock, Calendar } from "lucide-react"
-import { useState } from "react"
-import "../styles/movie-details.css"
+export default function MovieDetails({ movie, selectedShowtime }) {
+  const router = useRouter();
 
-export function MovieDetails({ movie }) {
-  const router = useRouter()
-  const [selectedShowtime, setSelectedShowtime] = useState("")
-
-  const handleBooking = () => {
-    if (selectedShowtime) {
-      router.push(`/booking/${movie.id}?showtime=${encodeURIComponent(selectedShowtime)}`)
+  function bookShowtime(time) {
+    if (!movie?._id) {
+      console.error("[MovieDetails] Invalid movie ID");
+      return;
     }
+
+    sessionStorage.setItem('lastMovieId', movie._id);
+    // เพิ่มราคาตั๋วใน URL parameters
+    const ticketPrice = movie.ticketPrice || 0;
+    router.push(`/booking/${movie._id}?showtime=${encodeURIComponent(time)}&price=${ticketPrice}`);
   }
 
   return (
-    <div className="movie-details-container">
-      {/* Movie Poster */}
-      <div className="movie-poster">
-        <Image
-          src={movie.poster || "/placeholder.svg"}
-          alt={movie.title}
-          fill
-          style={{ objectFit: "cover" }}
-          priority
-        />
-      </div>
+    <div className="movie-details">
+      <div className="movie-details-container">
+        <div className="movie-poster">
+          <img src={movie.poster || "/placeholder.svg"} alt={movie.title} />
+        </div>
 
-      {/* Movie Info */}
-      <div className="movie-info">
-        <div>
-          <h1 className="movie-title">{movie.title}</h1>
+        <div className="movie-content">
+          <h1 className="movie-title">
+            {movie.title}
+            {movie.year && <span className="movie-year">({movie.year})</span>}
+          </h1>
 
           <div className="movie-meta">
-            <div className="movie-rating">
-              <Star />
-              <span className="movie-rating-value">{movie.rating}</span>
-              <span>/10</span>
+            <div className="movie-price">
+              <span className="price-label">Ticket Price:</span>
+              <span className="price-value">
+                ฿{Number(movie.ticketPrice).toLocaleString()}
+              </span>
             </div>
-            <div className="movie-duration">
-              <Clock />
-              <span>{movie.duration}</span>
-            </div>
-            <div className="movie-genre">{movie.genre}</div>
+            {movie.duration && (
+              <div className="movie-duration">{movie.duration}</div>
+            )}
+            {movie.genre && (
+              <div className="movie-genre">{movie.genre}</div>
+            )}
           </div>
 
           <p className="movie-description">{movie.description}</p>
-        </div>
 
-        {/* Showtimes Selection */}
-        <div className="showtimes-card">
-          <div className="showtimes-header">
-            <Calendar />
-            <h2>Select Showtime</h2>
+          <div className="showtimes-card">
+            <div className="showtimes-header">
+              <h2>Available Showtimes</h2>
+            </div>
+
+            {(!movie.showtimes || movie.showtimes.length === 0) ? (
+              <div className="no-showtimes">
+                No showtimes available for this movie.
+              </div>
+            ) : (
+              <div className="showtimes-grid">
+                {movie.showtimes.map((time) => (
+                  <button
+                    key={time}
+                    className={`showtime-button ${selectedShowtime === time ? 'selected' : ''}`}
+                    onClick={() => bookShowtime(time)}
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-
-          <div className="showtimes-grid">
-            {movie.showtimes.map((time) => (
-              <button
-                key={time}
-                onClick={() => setSelectedShowtime(time)}
-                className={`showtime-button ${selectedShowtime === time ? "selected" : ""}`}
-              >
-                {time}
-              </button>
-            ))}
-          </div>
-
-          <button onClick={handleBooking} disabled={!selectedShowtime} className="booking-button">
-            {selectedShowtime ? `Continue to Seat Selection` : "Select a Showtime"}
-          </button>
         </div>
       </div>
     </div>
-  )
+  );
 }

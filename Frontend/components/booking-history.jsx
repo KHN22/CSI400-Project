@@ -1,27 +1,36 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { bookingsApi } from "@/lib/api"
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react"
 import "../styles/booking-history.css"
 
-export function BookingHistory() {
+export default function BookingHistory() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
+  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    let mounted = true
+    async function load() {
+      setLoading(true)
       try {
-        const data = await bookingsApi.getAll()
-        setBookings(data)
-      } catch (error) {
-        console.error("Failed to fetch bookings:", error)
+        const res = await fetch(`${BACKEND_BASE}/api/bookings`, { credentials: "include" })
+        if (!mounted) return
+        if (!res.ok) {
+          setBookings([])
+          return
+        }
+        const d = await res.json()
+        setBookings(d.bookings || [])
+      } catch {
+        if (mounted) setBookings([])
       } finally {
-        setLoading(false)
+        if (mounted) setLoading(false)
       }
     }
-
-    fetchBookings()
+    load()
+    return () => { mounted = false }
   }, [])
 
   if (loading) {
@@ -34,7 +43,7 @@ export function BookingHistory() {
     )
   }
 
-  if (bookings.length === 0) {
+  if (!bookings || bookings.length === 0) {
     return (
       <div className="empty-state">
         <Ticket />
@@ -45,46 +54,18 @@ export function BookingHistory() {
   }
 
   return (
-    <div className="bookings-list">
-      {bookings.map((booking) => (
-        <div key={booking.id} className="booking-card">
-          <div className="booking-card-content">
-            <div className="booking-info">
-              <div className="booking-title-row">
-                <h3 className="booking-title">{booking.movieTitle}</h3>
-                <span className={`booking-badge ${booking.status}`}>{booking.status}</span>
-              </div>
-
-              <div className="booking-meta">
-                <div className="booking-meta-item">
-                  <Calendar />
-                  <span>{new Date(booking.date).toLocaleDateString()}</span>
-                </div>
-
-                <div className="booking-meta-item">
-                  <Clock />
-                  <span>{booking.showtime}</span>
-                </div>
-
-                <div className="booking-meta-item">
-                  <MapPin />
-                  <span>Seats: {booking.seats.join(", ")}</span>
-                </div>
-
-                <div className="booking-meta-item tickets">
-                  <Ticket />
-                  <span>{booking.seats.length} Tickets</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="booking-price">
-              <span className="booking-price-label">Total Amount</span>
-              <span className="booking-price-value">${booking.total.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-      ))}
+    <div>
+      <h2>Your bookings</h2>
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {bookings.map(b => (
+          <li key={b._id || b.id} className="card" style={{ marginBottom: 10 }}>
+            <div><strong>{b.title}</strong></div>
+            <div><small className="text-muted">{b.showtime}</small></div>
+            <div>Seats: {(b.seats || []).join(", ")}</div>
+            <div><small className="text-muted">Booked: {new Date(b.createdAt).toLocaleString()}</small></div>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

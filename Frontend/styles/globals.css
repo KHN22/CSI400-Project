@@ -1,6 +1,121 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Global styles — restores layout, cards, movie grid, profile/bookings styling */
+:root{
+  --bg:#0b1220;
+  --panel:#0f172a;
+  --muted:#cbd5e1;
+  --accent:#0070f3;
+  --card:#ffffff;
+  --danger:#ef4444;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background:var(--bg);
+  color:var(--muted);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* layout container used by app/layout */
+.container{
+  max-width:1100px;
+  margin:28px auto;
+  padding:0 16px;
+}
+
+/* header / headings */
+h1,h2,h3{color:#fff;margin:0 0 12px}
+
+/* simple card */
+.card{
+  background:var(--panel);
+  color:var(--muted);
+  padding:12px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* movie grid (homepage) */
+.movie-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  margin-top:16px;
+}
+.movie-card{
+  background:var(--card);
+  color:#000;
+  padding:8px;
+  border-radius:8px;
+  display:flex;
+  flex-direction:column;
+}
+.movie-card .poster{
+  height:220px;
+  background:#e6e6e6;
+  border-radius:6px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+/* homepage specific */
+.home-container{padding:6px 0 40px}
+.home-header{margin-bottom:8px}
+.home-title{font-size:28px;color:#fff}
+.home-subtitle{color:#aeb7c6;margin-top:6px}
+
+/* profile & bookings */
+.profile, .bookings{
+  margin-top:12px;
+}
+.profile .info-row, .bookings li{
+  background:#fff;
+  color:#000;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:8px;
+}
+
+/* buttons */
+.btn{
+  display:inline-block;
+  padding:8px 12px;
+  background:var(--accent);
+  color:#fff;
+  border-radius:6px;
+  border:0;
+  cursor:pointer;
+  text-decoration:none;
+}
+.btn-danger{background:var(--danger)}
+
+/* small helpers */
+.text-muted{color:var(--muted);font-size:13px}
+
+/* tables */
+.table {
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  color:#000;
+  border-radius:8px;
+  overflow:hidden;
+}
+.table th, .table td {
+  padding:10px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+.table thead { background:#f5f7fb; }
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

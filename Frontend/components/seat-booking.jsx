@@ -1,47 +1,111 @@
-"use client"
+"use client";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import "../styles/seat-booking.css";
 
-import { useState, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import { SEAT_ROWS, SEAT_COLUMNS, SEAT_PRICE, getBookedSeats } from "@/lib/mock-data"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import "../styles/seat-booking.css"
+const ROWS = ["A", "B", "C", "D", "E", "F"];
+const SEATS_PER_ROW = 8;
 
-export function SeatBooking({ movie, showtime }) {
-  const router = useRouter()
-  const [selectedSeats, setSelectedSeats] = useState([])
+const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
-  const bookedSeats = useMemo(() => getBookedSeats(movie.id, showtime), [movie.id, showtime])
+export default function SeatBooking(props) {
+  const { movie, showtime: initialShowtime, showtimes } = props;
+  const router = useRouter();
+  const [selectedShowtime, setSelectedShowtime] = useState(initialShowtime || showtimes[0]);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const toggleSeat = (seat) => {
-    if (bookedSeats.includes(seat)) return
+  // fetch already booked seats for this movie+showtime from backend (optional)
+  const [booked, setBooked] = useState([]); // NEW: holds already-booked seats
 
-    setSelectedSeats((prev) => (prev.includes(seat) ? prev.filter((s) => s !== seat) : [...prev, seat]))
-  }
-
-  const getSeatStatus = (seat) => {
-    if (bookedSeats.includes(seat)) return "booked"
-    if (selectedSeats.includes(seat)) return "selected"
-    return "available"
-  }
-
-  const totalPrice = selectedSeats.length * SEAT_PRICE
-
-  const handleConfirmBooking = () => {
-    if (selectedSeats.length > 0) {
-      const bookingData = {
-        movieId: movie.id,
-        movieTitle: movie.title,
-        showtime,
-        seats: selectedSeats,
-        total: totalPrice,
+  useEffect(() => {
+    let mounted = true;
+    async function loadBooked() {
+      try {
+        const movieId = movie?._id || movie?.id;
+        const st = selectedShowtime;
+        if (!movieId || !st) {
+          if (mounted) setBooked([]);
+          return;
+        }
+        const url = `${BACKEND_BASE}/api/bookings/movie/${movieId}?showtime=${encodeURIComponent(st)}`;
+        const res = await fetch(url); // public endpoint
+        if (!res.ok) {
+          if (mounted) setBooked([]);
+          return;
+        }
+        const data = await res.json();
+        if (!mounted) return;
+        setBooked(Array.isArray(data.seats) ? data.seats : []);
+      } catch (err) {
+        if (mounted) setBooked([]);
       }
-      router.push(`/payment?data=${encodeURIComponent(JSON.stringify(bookingData))}`)
+    }
+    loadBooked();
+    return () => { mounted = false; };
+  }, [movie, selectedShowtime]);
+
+  function toggleSeat(r, c) {
+    const id = `${r}${c}`;
+    if (booked.includes(id)) return; // cannot select booked
+    setSelectedSeats(prev => {
+      if (prev.includes(id)) return prev.filter(s => s !== id);
+      return [...prev, id].slice(0, 10); // limit 10 seats
+    });
+  }
+
+  // คำนวณราคารวมจากราคาตั๋วคูณจำนวนที่นั่ง
+  const totalPrice = selectedSeats.length * (movie.ticketPrice || 0);
+
+  async function confirmBooking() {
+    if (selectedSeats.length === 0) {
+      setError("Please select at least one seat");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // ตรวจสอบว่าล็อกอินอยู่ ถ้าไม่อยู่ให้ไปหน้า login (preserve redirect)
+      const check = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}/api/auth/check`, {
+        credentials: "include"
+      });
+
+      if (!check.ok) {
+        // redirect to login, keep return path
+        router.push(`/login?redirect=/movie/${movie._id || movie.id}`);
+        return;
+      }
+
+      // สร้าง draft booking ใน sessionStorage แทนการ POST ตอนนี้
+      const ticketPrice = Number(movie.ticketPrice || 0);
+      const totalPrice = selectedSeats.length * ticketPrice;
+      const draft = {
+        movieId: movie._id || movie.id,
+        title: movie.title,
+        showtime: selectedShowtime,
+        seats: selectedSeats,
+        ticketPrice,
+        totalPrice
+      };
+      sessionStorage.setItem("pendingBooking", JSON.stringify(draft));
+
+      // ไปที่หน้า payment แบบ draft (dynamic route [id] จะรับค่า 'draft')
+      router.push(`/payment/draft`);
+    } catch (err) {
+      console.error("[SeatBooking] confirm error:", err);
+      setError(err.message || "Failed to proceed to payment");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="seat-booking-container">
+    <div className="seat-booking">
       {/* Header */}
       <div className="booking-header">
         <Link href={`/movie/${movie.id}`}>
@@ -52,7 +116,7 @@ export function SeatBooking({ movie, showtime }) {
         <div>
           <h1>{movie.title}</h1>
           <p>
-            Showtime: {showtime} • {new Date().toLocaleDateString()}
+            Showtime: {selectedShowtime} • {new Date().toLocaleDateString()}
           </p>
         </div>
       </div>
@@ -69,25 +133,24 @@ export function SeatBooking({ movie, showtime }) {
           {/* Seats */}
           <div className="seat-grid-container">
             <div className="seat-grid">
-              {SEAT_ROWS.map((row) => (
-                <div key={row} className="seat-row">
-                  <span className="row-label">{row}</span>
+              {ROWS.map((r) => (
+                <div className="seat-row" key={r}>
+                  <div className="row-label">{r}</div>
                   <div className="seat-columns">
-                    {SEAT_COLUMNS.map((col) => {
-                      const seatId = `${row}${col}`
-                      const status = getSeatStatus(seatId)
-
+                    {Array.from({ length: SEATS_PER_ROW }).map((_, i) => {
+                      const col = i + 1;
+                      const id = `${r}${col}`;
+                      const isBooked = booked.includes(id);
+                      const isSelected = selectedSeats.includes(id);
+                      let cls = "seat-button";
+                      if (isBooked) cls += " booked";
+                      else if (isSelected) cls += " selected";
+                      else cls += " available";
                       return (
-                        <button
-                          key={seatId}
-                          onClick={() => toggleSeat(seatId)}
-                          disabled={status === "booked"}
-                          className={`seat-button ${status}`}
-                          aria-label={`Seat ${seatId} - ${status}`}
-                        >
+                        <button key={id} className={cls} onClick={()=>toggleSeat(r,col)} disabled={isBooked}>
                           {col}
                         </button>
-                      )
+                      );
                     })}
                   </div>
                 </div>
@@ -97,60 +160,32 @@ export function SeatBooking({ movie, showtime }) {
 
           {/* Legend */}
           <div className="seat-legend">
-            <div className="legend-item">
-              <div className="legend-box available" />
-              <span className="legend-text">Available</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-box selected" />
-              <span className="legend-text">Selected</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-box booked" />
-              <span className="legend-text">Booked</span>
-            </div>
+            <div className="legend-item"><span className="legend-box available" /> Available</div>
+            <div className="legend-item"><span className="legend-box selected" /> Selected</div>
+            <div className="legend-item"><span className="legend-box booked" /> Booked</div>
           </div>
         </div>
 
         {/* Booking Summary */}
-        <div className="summary-card">
-          <h2>Booking Summary</h2>
-
+        <aside className="summary-card">
+          <h2>Summary</h2>
           <div className="summary-details">
-            <div className="summary-row">
-              <span className="summary-label">Movie</span>
-              <span className="summary-value">{movie.title}</span>
-            </div>
-            <div className="summary-row">
-              <span className="summary-label">Showtime</span>
-              <span className="summary-value">{showtime}</span>
-            </div>
-            <div className="summary-row">
-              <span className="summary-label">Date</span>
-              <span className="summary-value">{new Date().toLocaleDateString()}</span>
-            </div>
-            <div className="summary-row">
-              <span className="summary-label">Seats</span>
-              <span className="summary-value">{selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}</span>
-            </div>
-          </div>
-
-          <div className="summary-total">
-            <div className="summary-row">
-              <span className="summary-label">Price per seat</span>
-              <span>${SEAT_PRICE.toFixed(2)}</span>
-            </div>
+            <div className="summary-row"><div className="summary-label">Movie</div><div className="summary-value">{movie.title}</div></div>
+            <div className="summary-row"><div className="summary-label">Showtime</div><div className="summary-value">{selectedShowtime}</div></div>
+            <div className="summary-row"><div className="summary-label">Seats</div><div className="summary-value">{selectedSeats.join(", ") || "-"}</div></div>
             <div className="summary-total-row">
-              <span>Total</span>
-              <span className="summary-total-amount">${totalPrice.toFixed(2)}</span>
+              <div className="summary-total">Total</div>
+              <div className="summary-total-amount">฿{totalPrice.toLocaleString()}</div>
             </div>
+            <div style={{ marginTop: 12 }}>
+              <button className="confirm-button" onClick={confirmBooking} disabled={loading}>
+                {loading ? "Processing…" : "Proceed to Payment (mock)"}
+              </button>
+            </div>
+            {error && <div style={{ marginTop: 10, color: error.startsWith("Booking created") ? "green" : "red" }}>{error}</div>}
           </div>
-
-          <button onClick={handleConfirmBooking} disabled={selectedSeats.length === 0} className="confirm-button">
-            {selectedSeats.length > 0 ? "Confirm Booking" : "Select Seats"}
-          </button>
-        </div>
+        </aside>
       </div>
     </div>
-  )
+  );
 }

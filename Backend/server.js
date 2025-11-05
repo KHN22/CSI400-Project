@@ -1,0 +1,42 @@
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+
+const authRoutes = require('./routes/auth');
+const moviesRoutes = require('./routes/movies');
+const adminRoutes = require('./routes/admin');
+const bookingsRoutes = require('./routes/bookings'); // new
+const uploadsRoutes = require('./routes/uploads'); // added
+
+const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:3000',  // frontend origin
+  credentials: true
+}));
+app.use(express.json());
+app.use(require('cookie-parser')());
+
+// serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+// api routes
+app.use('/api/auth', authRoutes);
+app.use('/api/movies', moviesRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/bookings', bookingsRoutes);
+app.use('/api/uploads', uploadsRoutes); // new
+
+const PORT = process.env.PORT || 4000;
+
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('MongoDB connected');
+  app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+}).catch(err => {
+  console.error('MongoDB connection error:', err.message);
+});
