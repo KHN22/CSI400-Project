@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true },
   username: { type: String },
-  profileImage: { type: String, default: null }, // NEW: stores profile picture path or URL
+  profileImage: { type: String, default: '' },
   role: { type: String, enum: ['Guest', 'Admin'], default: 'Guest' }// new
 }, { timestamps: true });
 

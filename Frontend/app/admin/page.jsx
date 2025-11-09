@@ -93,7 +93,7 @@ export default function AdminPage() {
     } finally { setMLoading(false); }
   }
 
-  function startCreate() {
+  function cancelCreate() {
     setEditing(null);
     setForm({ title: "", year: "", description: "", poster: "", ticketPrice: "", showtimes: [] });
     setPosterFile(null);
@@ -314,7 +314,7 @@ export default function AdminPage() {
 
                   <div style={{ display: "flex", gap: 8 }}>
                     <button type="submit" className="btn">{editing ? "Save" : "Create"}</button>
-                    <button type="button" onClick={startCreate}>Cancel</button>
+                    <button type="button" onClick={cancelCreate}>Cancel</button>
                   </div>
                 </div>
               </form>

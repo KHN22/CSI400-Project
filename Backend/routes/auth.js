@@ -73,10 +73,44 @@ router.get('/check', verifyToken, (req, res) => {
   res.json({ user: req.user });
 });
 
+// GET /api/auth/me(old)
 // Add this endpoint so frontend can GET /api/auth/me
-router.get('/me', verifyToken, (req, res) => {
-  // verifyToken must set req.user
-  res.json({ user: req.user });
+// router.get('/me', verifyToken, async (req, res) => {
+//   // verifyToken must set req.user
+//   const { _id } = req.user;
+//   const user = await User.findOne({ _id });
+//   console.log(user.profileImage);
+//   console.log(req.user._id);
+//   res.json({ user: req.user });
+// });
+
+router.get('/me', verifyToken, async (req, res) => {
+  try {
+    // req.user._id was set by verifyToken
+    const { _id } = req.user;
+
+    // Fetch full user info from database
+    const user = await User.findById(_id).select('-password'); // exclude password for security
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Merge DB user with token info
+    const mergedUser = {
+      ...req.user,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage, // include your avatar path
+      id: user._id, // normalize naming if frontend expects 'id'
+    };
+
+    res.json({ user: mergedUser });
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
+
 
 module.exports = router;
