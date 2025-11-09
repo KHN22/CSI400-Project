@@ -20,8 +20,13 @@ export default function ProfilePage() {
     let mounted = true;
     async function load() {
       try {
-        const res = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: "include" });
-        if (res.status === 401) { router.push("/login"); return; }
+        const res = await fetch(`${BACKEND_BASE}/api/auth/me`, {
+          credentials: "include",
+        });
+        if (res.status === 401) {
+          router.push("/login");
+          return;
+        }
         const d = await res.json();
         if (mounted) setUser(d.user || null);
       } catch {
@@ -31,7 +36,9 @@ export default function ProfilePage() {
       }
     }
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // cleanup preview object URL
@@ -47,7 +54,10 @@ export default function ProfilePage() {
   // compute avatar (preview -> user.profileImage -> fallback)
   const computedAvatar = (() => {
     if (previewUrl) return previewUrl;
-    if (user && user.profileImage) return user.profileImage.startsWith("http") ? user.profileImage : `${BACKEND_BASE}${user.profileImage}`;
+    if (user && user.profileImage)
+      return user.profileImage.startsWith("http")
+        ? user.profileImage
+        : `${BACKEND_BASE}${user.profileImage}`;
     return null;
   })();
 
@@ -65,7 +75,8 @@ export default function ProfilePage() {
     setDirty(true); // mark profile as changed so Save button becomes active
   };
 
-  const triggerFileSelect = () => fileInputRef.current && fileInputRef.current.click();
+  const triggerFileSelect = () =>
+    fileInputRef.current && fileInputRef.current.click();
 
   // Upload selected file and update DB (POST /api/auth/avatar). Called by Save changes.
   const saveProfile = async () => {
@@ -91,13 +102,24 @@ export default function ProfilePage() {
       }
       const json = await res.json();
       // backend expected to return updated user e.g. { user: { ..., avatar: "/uploads/avatars/..." } }
-      const newPath = (json.user && (json.user.profileImage || json.user.avatar)) || json.profileImage || json.avatarPath || null;
+      const newPath =
+        (json.user && (json.user.profileImage || json.user.avatar)) ||
+        json.profileImage ||
+        json.avatarPath ||
+        null;
       if (newPath && user) {
         // normalize to frontend field used previously (avatar)
-        setUser(prev => ({ ...prev, avatar: newPath, profileImage: newPath }));
+        setUser((prev) => ({
+          ...prev,
+          avatar: newPath,
+          profileImage: newPath,
+        }));
       }
       setSelectedFile(null);
-      if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null); }
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
       setDirty(false);
     } catch (err) {
       console.error(err);
@@ -117,27 +139,106 @@ export default function ProfilePage() {
       <section className="profile-card">
         <div className="profile-form">
           <div className="profile-avatar-section">
-            <div className="profile-avatar">
+            <div
+              className="profile-avatar"
+              style={{
+                position: "relative",
+                width: 96,
+                height: 96,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={onFileChange}
+              />
+              <button
+                type="button"
+                onClick={triggerFileSelect}
+                disabled={uploading}
+                className="profile-change-avatar-button"
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  transform: "translate(-50%, 150%)",
+                  zIndex: 2,
+                  padding: "2px 35px 10px 35px",
+                  fontSize: 10,
+                  minWidth: 0,
+                  backgroundColor: "rgba(30, 30, 30, 0.5)",
+                }}
+              >
+                Choose
+              </button>
               {computedAvatar ? (
-                <img src={computedAvatar} alt="Avatar" style={{ width: 96, height: 96, borderRadius: "50%", objectFit: "cover" }} />
+                <img
+                  src={computedAvatar}
+                  alt="Avatar"
+                  style={{
+                    width: 96,
+                    height: 96,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
               ) : (
-                <div className="profile-avatar-fallback">{(user.email || "U")[0].toUpperCase()}</div>
+                <div
+                  className="profile-avatar-fallback"
+                  style={{
+                    width: 96,
+                    height: 96,
+                    borderRadius: "50%",
+                    background: "#e0e0e0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 40,
+                    fontWeight: 700,
+                    color: "#888",
+                  }}
+                >
+                  {(user.email || "U")[0].toUpperCase()}
+                </div>
               )}
-              <div style={{ marginTop: 8 }}>
-                <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={onFileChange} />
-                <button type="button" onClick={triggerFileSelect} disabled={uploading} className="profile-change-avatar-button">
-                  Choose
-                </button>
-                {/* Upload is performed by Save changes button to persist path to DB */}
-                <span style={{ marginLeft: 8, color: "#666" }}>{selectedFile ? selectedFile.name : null}</span>
-                {uploadError && <div style={{ color: "red", marginTop: 6 }}>{uploadError}</div>}
+              {/* filename and error below avatar */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: -22,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  fontSize: 13,
+                  color: "#666",
+                }}
+              >
+                {selectedFile ? selectedFile.name : null}
               </div>
+              {uploadError && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: -40,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    color: "red",
+                    fontSize: 13,
+                  }}
+                >
+                  {uploadError}
+                </div>
+              )}
             </div>
             <div className="profile-avatar-info">
-               <h2>{user.email}</h2>
-               <p className="text-muted">Role: {user.role}</p>
-               <p className="text-muted">UserId: {user.id}</p>
-             </div>
+              <h2>{user.email}</h2>
+              <p className="text-muted">Role: {user.role}</p>
+              <p className="text-muted">UserId: {user.id}</p>
+            </div>
           </div>
 
           <div className="profile-fields">
@@ -145,7 +246,7 @@ export default function ProfilePage() {
               <label>Email</label>
               <input type="email" value={user.email} readOnly />
             </div>
-            
+
             <div className="profile-field">
               <label>Role</label>
               <input type="text" value={user.role} readOnly />
@@ -160,7 +261,9 @@ export default function ProfilePage() {
             >
               {saving ? "Saving…" : "Save changes"}
             </button>
-            {saveError && <div style={{ color: "red", marginTop: 8 }}>{saveError}</div>}
+            {saveError && (
+              <div style={{ color: "red", marginTop: 8 }}>{saveError}</div>
+            )}
           </div>
         </div>
       </section>
