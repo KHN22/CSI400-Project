@@ -9,6 +9,7 @@ const moviesRoutes = require('./routes/movies');
 const adminRoutes = require('./routes/admin');
 const bookingsRoutes = require('./routes/bookings'); // new
 const uploadsRoutes = require('./routes/uploads'); // added
+const changeProfiles = require('./routes/profiles');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/movies', moviesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/uploads', uploadsRoutes); // new
+app.use('/api/auth/avatar', changeProfiles);
 
 const PORT = process.env.PORT || 4000;
 

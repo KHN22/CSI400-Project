@@ -93,7 +93,7 @@ export default function AdminPage() {
     } finally { setMLoading(false); }
   }
 
-  function startCreate() {
+  function cancelCreate() {
     setEditing(null);
     setForm({ title: "", year: "", description: "", poster: "", ticketPrice: "", showtimes: [] });
     setPosterFile(null);
@@ -206,6 +206,11 @@ export default function AdminPage() {
     } catch (err) {
       setMError(err.message || "Delete error");
     }
+  }
+
+  function startCreate() {
+    // navigate to admin create page (or open modal if you prefer)
+    router.push("/admin/create");
   }
 
   return (
@@ -407,34 +412,8 @@ export default function AdminPage() {
                   </div>
 
                   <div style={{ display: "flex", gap: 8 }}>
-                    {/* Create/Save: background #6366f1 with white text */}
-                    <button
-                      type="submit"
-                      style={{
-                        padding: "8px 12px",
-                        borderRadius: 6,
-                        border: "1px solid #6366f1",
-                        background: "#6366f1",
-                        color: "#fff",
-                        cursor: "pointer"
-                      }}
-                    >
-                      {editing ? "Save" : "Create"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={startCreate}
-                      style={{
-                        padding: "8px 12px",
-                        borderRadius: 6,
-                        border: "1px solid #6366f1",
-                        background: "transparent",
-                        color: "#cfe0ff",
-                        cursor: "pointer"
-                      }}
-                    >
-                      Cancel
-                    </button>
+                    <button type="submit" className="btn">{editing ? "Save" : "Create"}</button>
+                    <button type="button" onClick={startCreate}>Cancel</button>
                   </div>
                 </div>
               </form>
