@@ -9,6 +9,7 @@ const FIXED_SHOWTIMES = ["10:00", "13:00", "16:00", "19:00", "22:00"];
 export default function AdminPage() {
   const router = useRouter();
   const fileRef = useRef();
+  const createFormRef = useRef(null);
   const searchParams = useSearchParams(); // moved to top-level (hooks must be top-level)
 
   const [query, setQuery] = useState("");
@@ -209,8 +210,19 @@ export default function AdminPage() {
   }
 
   function startCreate() {
-    // navigate to admin create page (or open modal if you prefer)
-    router.push("/admin/create");
+    // clear editing state and scroll the create/edit form into view
+    setEditing(null);
+    setForm({ title: "", year: "", description: "", poster: "", ticketPrice: "", showtimes: [] });
+    setPosterFile(null);
+    setPosterPreview("");
+    if (fileRef.current) fileRef.current.value = "";
+    // smooth scroll to the form
+    if (createFormRef.current) {
+      createFormRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      // focus first input for quicker entry
+      const firstInput = createFormRef.current.querySelector('input');
+      if (firstInput) firstInput.focus();
+    }
   }
 
   return (
@@ -313,14 +325,8 @@ export default function AdminPage() {
                     {/* Edit: border color #6366f1 */}
                     <button
                       onClick={() => startEdit(m)}
-                      style={{
-                        padding: "6px 10px",
-                        borderRadius: 6,
-                        border: "1px solid #6366f1",
-                        background: "transparent",
-                        color: "#cfe0ff",
-                        cursor: "pointer"
-                      }}
+                      className="btn-outline-blue"
+                      style={{ padding: "6px 10px", fontSize: 14 }}
                     >
                       Edit
                     </button>
@@ -331,13 +337,13 @@ export default function AdminPage() {
             </div>
 
             <div style={{ marginTop: 16 }}>
-              <form onSubmit={saveMovie} className="card">
-                <h3>{editing ? "Edit movie" : "Add movie"}</h3>
-                <div style={{ display: "grid", gap: 8 }}>
-                  <input placeholder="Title" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} required />
-                  <input placeholder="Year" value={form.year} onChange={(e)=>setForm({...form, year:e.target.value})} />
-                  <input placeholder="Description" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
-                  <div>
+               <form ref={createFormRef} onSubmit={saveMovie} className="card">
+                 <h3>{editing ? "Edit movie" : "Add movie"}</h3>
+                 <div style={{ display: "grid", gap: 8 }}>
+                   <input placeholder="Title" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} required />
+                   <input placeholder="Year" value={form.year} onChange={(e)=>setForm({...form, year:e.target.value})} />
+                   <input placeholder="Description" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
+                   <div>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       {/* replaced visible file input with hidden input + visible button (background #6366f1) */}
                       <input
@@ -349,14 +355,8 @@ export default function AdminPage() {
                       />
                       <button
                         type="button"
-                        onClick={() => { if (fileRef.current) fileRef.current.click(); }}
-                        style={{
-                          padding: "6px 10px",
-                          borderRadius: 6,
-                          background: "#6366f1", // requested blue background
-                          border: "none",
-                          cursor: "pointer"
-                        }}
+                        onClick={() => { fileRef.current?.click(); }}
+                        className="btn-outline-blue"
                         aria-label="Choose poster"
                       >
                         Choose Poster
@@ -365,15 +365,8 @@ export default function AdminPage() {
                       {/* Clear: border color #6366f1 */}
                       <button
                         type="button"
-                        onClick={() => { setPosterFile(null); setPosterPreview(""); setForm(prev=>({ ...prev, poster: "" })); }}
-                        style={{
-                          padding: "6px 10px",
-                          borderRadius: 6,
-                          border: "1px solid #6366f1",
-                          background: "transparent",
-                          color: "#cfe0ff",
-                          cursor: "pointer"
-                        }}
+                        onClick={() => { /* clear handler */ }}
+                        className="btn-outline-blue"
                       >
                         Clear
                       </button>
@@ -381,9 +374,9 @@ export default function AdminPage() {
                     <div style={{ marginTop: 8 }}>
                       {posterPreview ? <img src={posterPreview} alt="preview" style={{ maxWidth: 240, borderRadius: 6 }} /> : form.poster ? <img src={form.poster} alt="poster" style={{ maxWidth: 240, borderRadius: 6 }} /> : null}
                     </div>
-                  </div>
+                   </div>
 
-                  <div>
+                   <div>
                     <div style={{ marginBottom: 6 }}>Showtimes (choose)</div>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       {FIXED_SHOWTIMES.map(t => {
@@ -396,10 +389,10 @@ export default function AdminPage() {
                         );
                       })}
                     </div>
-                  </div>
+                   </div>
 
-                  {/* New ticket price field */}
-                  <div>
+                   {/* New ticket price field */}
+                   <div>
                     <input
                       placeholder="Ticket Price (฿)"
                       type="number"
@@ -409,18 +402,31 @@ export default function AdminPage() {
                       onChange={(e) => setForm({ ...form, ticketPrice: e.target.value })}
                       required
                     />
-                  </div>
+                   </div>
 
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button type="submit" className="btn">{editing ? "Save" : "Create"}</button>
-                    <button type="button" onClick={startCreate}>Cancel</button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </section>
-    </div>
-  );
-}
+                   <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="submit"
+                      className="btn-outline-blue"
+                      style={{ padding: "8px 12px", borderRadius: 6 }}
+                    >
+                      {editing ? "Save" : "Create"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cancelCreate}
+                      className="btn-outline-blue"
+                      style={{ background: "transparent" }}
+                    >
+                      Cancel
+                    </button>
+                   </div>
+                 </div>
+               </form>
+             </div>
+           </div>
+         )}
+       </section>
+     </div>
+   );
+ }

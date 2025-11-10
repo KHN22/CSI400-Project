@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react"
-import { BookingHistory } from "@/components/booking-history"
 import "@/styles/booking-history.css"
 
 export default function BookingsPage() {
@@ -11,6 +10,32 @@ export default function BookingsPage() {
   const [error, setError] = useState("")
   const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
   const router = useRouter()
+
+  function looksLikeObjectId(s) {
+    return typeof s === "string" && /^[0-9a-fA-F]{24}$/.test(s)
+  }
+
+  function resolveTitle(b) {
+    if (!b) return ""
+    if (b.title) return b.title
+    if (b.movieTitle) return b.movieTitle
+    if (b.movieName) return b.movieName
+    if (b.movie && typeof b.movie === "object") {
+      return b.movie.title || b.movie.name || b.movie.movieTitle || ""
+    }
+    if (typeof b.movie === "string" && !looksLikeObjectId(b.movie)) return b.movie
+    return ""
+  }
+
+  // New: resolve description from booking/movie object
+  function resolveDescription(b) {
+    if (!b) return ""
+    if (b.description) return b.description
+    if (b.movie && typeof b.movie === "object") {
+      return b.movie.description || b.movie.synopsis || b.movie.summary || ""
+    }
+    return ""
+  }
 
   useEffect(() => {
     let mounted = true
@@ -22,7 +47,34 @@ export default function BookingsPage() {
         if (res.status === 401) { router.push("/login"); return }
         if (!res.ok) { setError("Failed to load bookings"); return }
         const d = await res.json()
-        if (mounted) setBookings(d.bookings || [])
+        const raw = d.bookings || []
+
+        const toFetch = raw.filter(b => {
+          const t = resolveTitle(b)
+          return !t && (looksLikeObjectId(b.movie) || looksLikeObjectId(b.movieId) || b.movieId)
+        })
+
+        if (toFetch.length > 0) {
+          await Promise.all(toFetch.map(async (b) => {
+            try {
+              const movieId = b.movie?._id || (looksLikeObjectId(b.movie) ? b.movie : null) || (looksLikeObjectId(b.movieId) ? b.movieId : b.movieId)
+              if (!movieId) return
+              const mr = await fetch(`${BACKEND_BASE}/api/movies/${movieId}`, { credentials: "include" })
+              if (!mr.ok) return
+              const md = await mr.json()
+              const movieObj = md.movie || md
+              if (movieObj) {
+                b.movie = movieObj
+                b.title = movieObj.title || movieObj.name || b.title
+                b.description = movieObj.description || b.description
+              }
+            } catch (e) {
+              // ignore per-item errors
+            }
+          }))
+        }
+
+        if (mounted) setBookings(raw)
       } catch {
         if (mounted) setError("Network error")
       } finally {
@@ -48,6 +100,8 @@ export default function BookingsPage() {
           <h1 style={{ color: "#fff" }}>Your Bookings</h1>
           <ul style={{ listStyle: "none", padding: 0, marginTop: 12 }}>
             {bookings.map(b => {
+              const title = resolveTitle(b) || "Untitled movie"
+              const description = resolveDescription(b) || "No description available"
               const seats = b.seats || []
               const seatsStr = Array.isArray(seats) ? seats.join(", ") : seats
               const ticketsCount = Array.isArray(seats) ? seats.length : (b.tickets || 0)
@@ -68,44 +122,41 @@ export default function BookingsPage() {
               }
               const isConfirmed = (b.status && String(b.status).toLowerCase() === "confirmed") || b.confirmed === true
 
+              // shorten description for display
+              const shortDesc = description.length > 120 ? description.slice(0, 120) + "…" : description
+
               return (
-                <li key={b._id} className={`booking-card ${isConfirmed ? "confirmed" : ""}`} style={{ marginBottom: 12 }}>
+                <li key={b._id || b.id || Math.random()} className={`booking-card ${isConfirmed ? "confirmed" : ""}`} style={{ marginBottom: 12 }}>
                   <div className="booking-card-content">
                     <div className="booking-info">
                       <div className="booking-title-row">
-                        <div className="booking-title" style={{ color: "#fff" }}>{b.title}</div>
+                        <div className="booking-title" style={{ color: "#fff" }}>🎬 {title}</div>
                         {isConfirmed && <div className="booking-badge confirmed">Confirmed</div>}
                       </div>
 
                       <div className="booking-meta">
-
-                       <div className="movie-title-box">
-          🎬 {b.title || b.movieTitle || b.movie || b.movieName || ""}
-        </div>
+                        {/* show description here instead of repeating title */}
+                        <div className="movie-title-box" title={description}>
+                          {shortDesc}
+                        </div>
 
                         <div className="booking-meta-item">
                           <Calendar />
-                          <span>    
-    {b.date
-      ? new Date(b.date).toLocaleDateString("th-TH", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        })
-      : b.date
-      ? new Date(b.date).toLocaleDateString("th-TH", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        })
-      : b.createdAt
-      ? new Date(b.createdAt).toLocaleDateString("th-TH", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        })
-      : "ยังไม่ระบุวันที่"}
-  </span>
+                          <span>
+                            {b.date
+                              ? new Date(b.date).toLocaleDateString("th-TH", {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                              : b.createdAt
+                              ? new Date(b.createdAt).toLocaleDateString("th-TH", {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                              : "ยังไม่ระบุวันที่"}
+                          </span>
                         </div>
 
                         <div className="booking-meta-item">
@@ -117,7 +168,7 @@ export default function BookingsPage() {
                           <MapPin />
                           <span style={{ color: "#aeb7c6" }}>{seatsStr}</span>
                         </div>
-                        
+
                         <div className="booking-meta-item tickets">
                           <Ticket />
                           <span>{ticketsCount} ticket{ticketsCount !== 1 ? "s" : ""}</span>

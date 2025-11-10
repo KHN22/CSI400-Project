@@ -4,7 +4,6 @@
   padding: 32px;
   background: #1a1a2e;
   border-radius: 12px;
-  border: 1px solid #6366f1;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -152,81 +151,54 @@
 }
 
 .showtime-button {
-  border: 2px solid #6366f1;
-  background: #6366f1;
-  padding: 0.75rem 1rem;
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
-  text-align: center;
-  font-weight: 500;
+  background: #000; /* black fill */
+  color: #cfe0ff;   /* muted light text */
+  border: 1px solid #6366f1; /* blue frame */
   cursor: pointer;
-  transition: all 0.2s;
-  color: #e8e8f0;
+  font-weight: 600;
+  transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+  box-shadow: none;
 }
 
-.showtime-button:hover {
-  border-color: rgba(99, 102, 241, 0.5);
+.showtime-button:hover,
+.showtime-button:focus {
+  background: #6366f1; /* bright blue */
+  color: #061021; /* darker text for contrast */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(47,107,246,0.18);
+  outline: none;
+}
+
+.showtime-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(16,24,40,0.12);
 }
 
 .showtime-button.selected {
-  border-color: #6366f1;
-  background: #6366f1;
-  color: white;
+  background: #2f6bf6;
+  color: #061021;
+  border-color: #2f6bf6;
 }
 
-.showtime-btn {
-  padding: 12px 16px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #374151;
-  background: white;
-  border: 2px solid #6366f1;
+.showtimes-card,
+.showtimes-header {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.movie-poster img {
+  border: 0;
+  box-shadow: 0 4px 18px rgba(2,6,23,0.6);
+  background: #071018;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.showtime-btn:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
-  transform: translateY(-1px);
-}
-
-.showtime-btn.selected {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-}
-
-.booking-button {
-  width: 100%;
-  padding: 0.75rem 1.5rem;
-  background: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.booking-button:hover:not(:disabled) {
-  background: #5558e3;
-}
-
-.booking-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.no-showtimes {
-  padding: 24px;
-  background: #fee2e2;
-  border-radius: 8px;
-  color: #ef4444;
-  text-align: center;
-  font-size: 1.1rem;
 }
 
 .movie-price {
@@ -269,4 +241,45 @@
   .showtimes-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
+}
+
+/* Remove unintended bright blue frames in this component */
+.movie-details,
+.movie-details * {
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Outline blue button: default black bg + blue border; on hover fill blue */
+.btn-outline-blue {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #000; /* black fill by default */
+  color: #cfe0ff;
+  border: 1px solid #6366f1; /* primary blue */
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+  box-shadow: none;
+}
+
+/* Hover/focus: filled with the same brand blue */
+.btn-outline-blue:hover,
+.btn-outline-blue:focus {
+  background: #6366f1; /* use requested blue */
+  color: #061021;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99,102,241,0.18);
+  outline: none;
+}
+
+.btn-outline-blue:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(16,24,40,0.12);
 }
