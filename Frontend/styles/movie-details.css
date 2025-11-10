@@ -2,8 +2,9 @@
   max-width: 1200px;
   margin: 32px auto;
   padding: 32px;
-  background: white;
+  background: #1a1a2e;
   border-radius: 12px;
+  border: 1px solid #6366f1;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -43,7 +44,7 @@
 .movie-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #ffffff;
   margin: 0 0 8px 0;
 }
 
@@ -114,7 +115,7 @@
 
 .showtimes-card {
   background: #16162a;
-  border: 1px solid #2a2a3e;
+  border: 1px solid #6366f1;
   border-radius: 0.5rem;
   padding: 1.5rem;
 }
@@ -151,8 +152,8 @@
 }
 
 .showtime-button {
-  border: 2px solid #2a2a3e;
-  background: #16162a;
+  border: 2px solid #6366f1;
+  background: #6366f1;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   text-align: center;
@@ -178,7 +179,7 @@
   font-weight: 500;
   color: #374151;
   background: white;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #6366f1;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;

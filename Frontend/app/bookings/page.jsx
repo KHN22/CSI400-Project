@@ -1,7 +1,9 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { Calendar, Clock, MapPin, Ticket } from "lucide-react"
 import { BookingHistory } from "@/components/booking-history"
+import "@/styles/booking-history.css"
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([])
@@ -45,13 +47,92 @@ export default function BookingsPage() {
         <div style={{ padding: 20 }}>
           <h1 style={{ color: "#fff" }}>Your Bookings</h1>
           <ul style={{ listStyle: "none", padding: 0, marginTop: 12 }}>
-            {bookings.map(b => (
-              <li key={b._id} style={{ background: "#fff", marginBottom: 12, padding: 12, borderRadius: 8 }}>
-                <div><strong>{b.title}</strong> — {b.showtime}</div>
-                <div>Seats: {b.seats.join ? b.seats.join(", ") : b.seats}</div>
-                <div>Booked at: {new Date(b.createdAt).toLocaleString()}</div>
-              </li>
-            ))}
+            {bookings.map(b => {
+              const seats = b.seats || []
+              const seatsStr = Array.isArray(seats) ? seats.join(", ") : seats
+              const ticketsCount = Array.isArray(seats) ? seats.length : (b.tickets || 0)
+              const total = b.totalPrice ?? (b.ticketPrice ? (b.ticketPrice * ticketsCount) : (b.total || 0))
+              const showtimeStr = b.showtime || ""
+              let dateLabel = showtimeStr
+              let timeLabel = ""
+              if (showtimeStr && showtimeStr.includes("T")) {
+                const dt = new Date(showtimeStr)
+                if (!isNaN(dt)) {
+                  dateLabel = dt.toLocaleDateString()
+                  timeLabel = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }
+              } else if (showtimeStr.includes(" ")) {
+                const parts = showtimeStr.split(" ")
+                dateLabel = parts[0]
+                timeLabel = parts.slice(1).join(" ")
+              }
+              const isConfirmed = (b.status && String(b.status).toLowerCase() === "confirmed") || b.confirmed === true
+
+              return (
+                <li key={b._id} className={`booking-card ${isConfirmed ? "confirmed" : ""}`} style={{ marginBottom: 12 }}>
+                  <div className="booking-card-content">
+                    <div className="booking-info">
+                      <div className="booking-title-row">
+                        <div className="booking-title" style={{ color: "#fff" }}>{b.title}</div>
+                        {isConfirmed && <div className="booking-badge confirmed">Confirmed</div>}
+                      </div>
+
+                      <div className="booking-meta">
+
+                       <div className="movie-title-box">
+          🎬 {b.title || b.movieTitle || b.movie || b.movieName || ""}
+        </div>
+
+                        <div className="booking-meta-item">
+                          <Calendar />
+                          <span>    
+    {b.date
+      ? new Date(b.date).toLocaleDateString("th-TH", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        })
+      : b.date
+      ? new Date(b.date).toLocaleDateString("th-TH", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        })
+      : b.createdAt
+      ? new Date(b.createdAt).toLocaleDateString("th-TH", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        })
+      : "ยังไม่ระบุวันที่"}
+  </span>
+                        </div>
+
+                        <div className="booking-meta-item">
+                          <Clock />
+                          <span>{timeLabel || (b.showtime || "")}</span>
+                        </div>
+
+                        <div className="booking-meta-item">
+                          <MapPin />
+                          <span style={{ color: "#aeb7c6" }}>{seatsStr}</span>
+                        </div>
+                        
+                        <div className="booking-meta-item tickets">
+                          <Ticket />
+                          <span>{ticketsCount} ticket{ticketsCount !== 1 ? "s" : ""}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="booking-price">
+                      <div className="booking-price-label">Total</div>
+                      <div className="booking-price-value">฿{Number(total || 0).toLocaleString()}</div>
+                    </div>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>

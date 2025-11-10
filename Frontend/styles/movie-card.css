@@ -37,7 +37,7 @@
   margin-bottom: 8px;
   font-size: 20px;
   font-weight: bold;
-  color: #e0e0e0;
+  color: #ffffff;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -50,6 +50,7 @@
   gap: 16px;
   font-size: 14px;
   color: #a0a0b0;
+
 }
 
 .movie-card-rating,
@@ -74,7 +75,7 @@
 .movie-card-genre {
   margin-bottom: 16px;
   font-size: 14px;
-  color: #707080;
+  color: #0e0eff;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

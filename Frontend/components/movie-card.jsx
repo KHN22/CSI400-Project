@@ -49,7 +49,7 @@ export function MovieCard({ movie }) {
           <button
             className="btn"
             onClick={(evt) => { evt.stopPropagation(); openMovie(); }}
-            style={{ pointerEvents: "auto" }}
+            style={{ pointerEvents: "auto", background: "#6366f1" }}
           >
             View showtimes
           </button>

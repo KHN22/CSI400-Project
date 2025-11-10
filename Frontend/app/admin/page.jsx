@@ -250,18 +250,76 @@ export default function AdminPage() {
         {mLoading ? <div>Loading movies…</div> : (
           <div>
             <div style={{ marginBottom: 12 }}>
-              <button onClick={startCreate} className="btn">Add new movie</button>
+              {/* Add new movie: border color #6366f1 */}
+              <button
+                onClick={startCreate}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  border: "1px solid #6366f1",
+                  background: "transparent",
+                  color: "#cfe0ff",
+                  cursor: "pointer"
+                }}
+              >
+                Add new movie
+              </button>
             </div>
             <div style={{ display: "grid", gap: 12 }}>
               {movies.map(m => (
                 <div key={m._id} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
-                    <div style={{ fontWeight: 700 }}>{m.title} {m.year ? `(${m.year})` : ''}</div>
-                    <div style={{ fontSize: 13, color: "#666" }}>{(m.showtimes || []).join(" • ")}</div>
+                    {/* Title and showtimes as clickable buttons to edit */}
+                    <button
+                      onClick={() => startEdit(m)}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        padding: 0,
+                        margin: 0,
+                        textAlign: "left",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                        fontSize: "1rem",
+                        color: "white"
+                      }}
+                    >
+                      {m.title} {m.year ? `(${m.year})` : ''}
+                    </button>
+                    <div>
+                      <button
+                        onClick={() => startEdit(m)}
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          padding: 0,
+                          margin: 0,
+                          textAlign: "left",
+                          cursor: "pointer",
+                          fontSize: 13,
+                          color: "#666"
+                        }}
+                      >
+                        {(m.showtimes || []).join(" • ")}
+                      </button>
+                    </div>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={()=>startEdit(m)} className="btn">Edit</button>
-                    <button onClick={()=>deleteMovie(m._id)} className="btn btn-danger">Delete</button>
+                    {/* Edit: border color #6366f1 */}
+                    <button
+                      onClick={() => startEdit(m)}
+                      style={{
+                        padding: "6px 10px",
+                        borderRadius: 6,
+                        border: "1px solid #6366f1",
+                        background: "transparent",
+                        color: "#cfe0ff",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button onClick={() => deleteMovie(m._id)} className="btn btn-danger">Delete</button>
                   </div>
                 </div>
               ))}
@@ -276,8 +334,44 @@ export default function AdminPage() {
                   <input placeholder="Description" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
                   <div>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} />
-                      <button type="button" onClick={() => { setPosterFile(null); setPosterPreview(""); setForm(prev=>({ ...prev, poster: "" })); }} className="btn">Clear</button>
+                      {/* replaced visible file input with hidden input + visible button (background #6366f1) */}
+                      <input
+                        ref={fileRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={onFileChange}
+                        style={{ display: "none" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => { if (fileRef.current) fileRef.current.click(); }}
+                        style={{
+                          padding: "6px 10px",
+                          borderRadius: 6,
+                          background: "#6366f1", // requested blue background
+                          border: "none",
+                          cursor: "pointer"
+                        }}
+                        aria-label="Choose poster"
+                      >
+                        Choose Poster
+                      </button>
+
+                      {/* Clear: border color #6366f1 */}
+                      <button
+                        type="button"
+                        onClick={() => { setPosterFile(null); setPosterPreview(""); setForm(prev=>({ ...prev, poster: "" })); }}
+                        style={{
+                          padding: "6px 10px",
+                          borderRadius: 6,
+                          border: "1px solid #6366f1",
+                          background: "transparent",
+                          color: "#cfe0ff",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Clear
+                      </button>
                     </div>
                     <div style={{ marginTop: 8 }}>
                       {posterPreview ? <img src={posterPreview} alt="preview" style={{ maxWidth: 240, borderRadius: 6 }} /> : form.poster ? <img src={form.poster} alt="poster" style={{ maxWidth: 240, borderRadius: 6 }} /> : null}
@@ -313,8 +407,34 @@ export default function AdminPage() {
                   </div>
 
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button type="submit" className="btn">{editing ? "Save" : "Create"}</button>
-                    <button type="button" onClick={startCreate}>Cancel</button>
+                    {/* Create/Save: background #6366f1 with white text */}
+                    <button
+                      type="submit"
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 6,
+                        border: "1px solid #6366f1",
+                        background: "#6366f1",
+                        color: "#fff",
+                        cursor: "pointer"
+                      }}
+                    >
+                      {editing ? "Save" : "Create"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={startCreate}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 6,
+                        border: "1px solid #6366f1",
+                        background: "transparent",
+                        color: "#cfe0ff",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               </form>

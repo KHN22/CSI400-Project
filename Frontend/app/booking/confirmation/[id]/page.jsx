@@ -55,8 +55,44 @@ export default function BookingConfirmationPage() {
         <div>Seats: {seats.join(", ")}</div>
         <div>Total: ฿{Number(total).toLocaleString()}</div>
         <div style={{ marginTop: 12 }}>
-          <button onClick={() => router.push("/bookings")} style={{marginRight:8}}>View Booking History</button>
-          <button onClick={() => router.push(`/movie/${booking.movie?._id || booking.movieId || booking.movie?.id}`)}>Back to Movie</button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              onClick={() => router.push("/bookings")}
+              style={{
+                padding: "8px 12px",
+                borderRadius: 6,
+                background: "#6366f1",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              View Booking History
+            </button>
+            <button
+              onClick={() => router.push(`/movie/${booking.movie?._id || booking.movieId || booking.movie?.id}`)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: 6,
+                background: "#6366f1",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Back to Movie
+            </button>
+            <button
+              onClick={() => { if (typeof window !== "undefined") window.print(); }}
+              style={{
+                padding: "8px 12px",
+                borderRadius: 6,
+                background: "#6366f1",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Download Receipt
+            </button>
+          </div>
         </div>
       </div>
     </div>

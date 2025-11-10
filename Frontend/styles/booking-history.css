@@ -196,6 +196,30 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+.movie-title-with-date {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.movie-title-box {
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.movie-date-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #cbd5e1;
+}
+
+
 @keyframes pulse {
   0%,
   100% {
