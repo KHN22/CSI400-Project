@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import "@/styles/profile.css";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -140,14 +141,14 @@ export default function ProfilePage() {
         <div className="profile-form">
           <div className="profile-avatar-section">
             <div
-              className="profile-avatar"
+              className="profile-avatar-wrapper"
               style={{
-                position: "relative",
                 width: 96,
                 height: 96,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                position: "relative",
               }}
             >
               <input
@@ -157,28 +158,13 @@ export default function ProfilePage() {
                 style={{ display: "none" }}
                 onChange={onFileChange}
               />
-              <button
-                type="button"
-                onClick={triggerFileSelect}
-                disabled={uploading}
-                className="profile-change-avatar-button"
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  transform: "translate(-50%, 150%)",
-                  zIndex: 2,
-                  padding: "2px 35px 10px 35px",
-                  fontSize: 10,
-                  minWidth: 0,
-                  backgroundColor: "rgba(30, 30, 30, 0.5)",
-                }}
-              >
-                Choose
-              </button>
+
+              {/* Avatar image or fallback */}
               {computedAvatar ? (
                 <img
                   src={computedAvatar}
                   alt="Avatar"
+                  className="profile-avatar-img"
                   style={{
                     width: 96,
                     height: 96,
@@ -194,7 +180,6 @@ export default function ProfilePage() {
                     width: 96,
                     height: 96,
                     borderRadius: "50%",
-                    background: "#e0e0e0",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -206,34 +191,26 @@ export default function ProfilePage() {
                   {(user.email || "U")[0].toUpperCase()}
                 </div>
               )}
-              {/* filename and error below avatar */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: -22,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  fontSize: 13,
-                  color: "#666",
-                }}
+
+              {/* overlay holder: appears on hover, clickable to open file selector */}
+              <button
+                type="button"
+                className="profile-avatar-overlay"
+                onClick={triggerFileSelect}
+                aria-label="Change avatar"
               >
+                <span className="overlay-plus">+</span>
+              </button>
+
+              {/* filename and error below avatar */}
+              <div className="profile-avatar-filename">
                 {selectedFile ? selectedFile.name : null}
               </div>
               {uploadError && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: -40,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    color: "red",
-                    fontSize: 13,
-                  }}
-                >
-                  {uploadError}
-                </div>
+                <div className="profile-avatar-error">{uploadError}</div>
               )}
             </div>
+
             <div className="profile-avatar-info">
               <h2>{user.email}</h2>
               <p className="text-muted">Role: {user.role}</p>

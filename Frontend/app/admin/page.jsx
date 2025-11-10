@@ -208,6 +208,11 @@ export default function AdminPage() {
     }
   }
 
+  function startCreate() {
+    // navigate to admin create page (or open modal if you prefer)
+    router.push("/admin/create");
+  }
+
   return (
     <div style={{ padding: 20 }}>
       <h1>Admin Dashboard</h1>
