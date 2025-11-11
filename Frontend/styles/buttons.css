@@ -1,0 +1,40 @@
+/* Outline blue button: default black bg + #6366f1 border; hover => filled #6366f1 */
+.btn-outline-blue {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #000; /* black fill by default */
+  color: #cfe0ff;
+  border: 1px solid #6366f1; /* primary blue */
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+  box-shadow: none;
+}
+
+.btn-outline-blue:hover,
+.btn-outline-blue:focus {
+  background: #6366f1; /* requested blue */
+  color: #061021;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99,102,241,0.18);
+  outline: none;
+}
+
+.btn-outline-blue:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(16,24,40,0.12);
+}
+
+/* disabled state */
+.btn-outline-blue[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

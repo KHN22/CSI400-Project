@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import "@/styles/buttons.css";
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -12,16 +13,20 @@ export default function LogoutButton() {
         method: "POST",
         credentials: "include",
       });
-    } catch (err) {
+    } catch (e) {
       // ignore
-    } finally {
-      router.push("/login");
     }
+
+    try { window.dispatchEvent(new Event("auth-changed")); } catch(e){}
+    try { localStorage.setItem("auth", String(Date.now())); } catch(e){}
+    try { new BroadcastChannel("auth").postMessage("changed"); } catch(e){}
+
+    try { router.push("/login"); } catch(e){}
   };
 
   return (
-    <button onClick={handleLogout} style={{ padding: "6px 10px", background: "#ef4444", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}>
-      Sign out
+    <button onClick={handleLogout} className="btn-outline-blue" aria-label="Logout" type="button">
+      Logout
     </button>
   );
 }

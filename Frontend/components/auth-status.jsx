@@ -1,58 +1,71 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import LogoutButton from "./logout-button";
 
 export default function AuthStatus() {
+  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setLoading(true);
-      try {
-        const res = await fetch(`${BACKEND_BASE}/api/auth/me`, {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (mounted) setUser(data.user || null);
-        } else {
-          if (mounted) setUser(null);
-        }
-      } catch {
-        if (mounted) setUser(null);
-      } finally {
-        if (mounted) setLoading(false);
+  async function fetchUser() {
+    setLoading(true);
+    try {
+      // try common endpoints (adjust if your backend uses another path)
+      const endpoints = [`${BACKEND_BASE}/api/auth/me`, `${BACKEND_BASE}/api/auth/profile`, `${BACKEND_BASE}/api/users/me`];
+      let data = null;
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, { credentials: "include" });
+          if (!res.ok) continue;
+          data = await res.json();
+          break;
+        } catch (e) { continue; }
       }
+      // backend might return { user } or user object directly
+      const u = data?.user || data?.profile || data || null;
+      setUser(u);
+    } catch (err) {
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
-    load();
-    // re-check on focus (optional)
-    const handler = () => load();
-    window.addEventListener("focus", handler);
-    return () => { mounted = false; window.removeEventListener("focus", handler); };
-  }, []);
-
-  if (loading) return null;
-
-  if (!user) {
-    return (
-      <div>
-        <a href="/login" style={{ color: "#fff", textDecoration: "none", marginRight: 8 }}>Sign in</a>
-      </div>
-    );
   }
 
+  useEffect(() => {
+    fetchUser();
+
+    // respond to custom event from login/logout flows
+    const onAuth = () => fetchUser();
+    window.addEventListener("auth-changed", onAuth);
+
+    // storage event for cross-tab (some flows set a localStorage key)
+    const onStorage = (e) => {
+      if (!e) return;
+      if (e.key === "auth" || e.key === "auth-change") fetchUser();
+    };
+    window.addEventListener("storage", onStorage);
+
+    // BroadcastChannel for modern cross-tab messaging
+    let bc;
+    try {
+      bc = new BroadcastChannel("auth");
+      bc.onmessage = () => fetchUser();
+    } catch (e) { /* not supported */ }
+
+    return () => {
+      window.removeEventListener("auth-changed", onAuth);
+      window.removeEventListener("storage", onStorage);
+      if (bc) bc.close();
+    };
+  }, []);
+
+  // Render: adapt to your existing markup structure
+  if (loading) return <div className="auth-status">…</div>;
+  if (!user) return <div className="auth-status"><a href="/login">Sign in</a></div>;
+
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-      <div style={{ color: "#fff" }}>
-        <div style={{ fontSize: 12, opacity: 0.85 }}>{user.email}</div>
-        <div style={{ fontSize: 12, opacity: 0.7 }}>{user.role}</div>
-      </div>
-      <LogoutButton />
+    <div className="auth-status">
+      <span>{user.email || user.username}</span>
+      {/* keep any existing UI (avatar, menu) here */}
     </div>
   );
 }

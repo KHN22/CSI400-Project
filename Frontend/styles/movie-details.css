@@ -183,9 +183,9 @@
 }
 
 .showtime-button.selected {
-  background: #2f6bf6;
+  background: #6366f1;
   color: #061021;
-  border-color: #2f6bf6;
+  border-color: #6366f1;
 }
 
 .showtimes-card,
@@ -206,19 +206,19 @@
   align-items: center;
   gap: 8px;
   padding: 4px 12px;
-  background: #f3f4f6;
+  background: #000000;
   border-radius: 6px;
 }
 
 .price-label {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: #ffffff;
 }
 
 .price-value {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #059669;
+  color: #ffffff;
 }
 
 /* Responsive adjustments */

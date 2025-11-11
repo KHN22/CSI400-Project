@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import "@/styles/buttons.css";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,7 +43,12 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
-        // backend set httpOnly cookie "token" -> middleware will allow
+        // Notify in-tab components
+        try { window.dispatchEvent(new Event("auth-changed")); } catch(e){}
+        // Notify other tabs (cross-tab)
+        try { localStorage.setItem("auth", String(Date.now())); } catch(e){}
+        try { new BroadcastChannel("auth").postMessage("changed"); } catch(e){}
+        // redirect after notifying
         router.push(from);
       } else {
         const data = await res.json().catch(() => ({}));
@@ -91,6 +97,10 @@ export default function LoginPage() {
           body: JSON.stringify({ email: registerData.email, password: registerData.password }),
         });
         if (loginRes.ok) {
+          // notify after login so navbar/auth-status refresh immediately
+          try { window.dispatchEvent(new Event("auth-changed")); } catch(e){}
+          try { localStorage.setItem("auth", String(Date.now())); } catch(e){}
+          try { new BroadcastChannel("auth").postMessage("changed"); } catch(e){}
           router.push(from);
         } else {
           setRegisterSuccess("Registered. Please sign in.");
@@ -105,6 +115,40 @@ export default function LoginPage() {
       setRegisterError("Network error. Ensure backend is running.");
     }
   };
+
+  async function handleLoginSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${BACKEND_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(()=>null);
+        throw new Error(txt || "Login failed");
+      }
+
+      // Notify in-tab components
+      try { window.dispatchEvent(new Event("auth-changed")); } catch(e){}
+
+      // Notify other tabs (cross-tab)
+      try { localStorage.setItem("auth", String(Date.now())); } catch(e){}
+      try { new BroadcastChannel("auth").postMessage("changed"); } catch(e){}
+
+      // Redirect after notifying so listeners can react
+      router.push("/");
+
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: "#111827" }}>
@@ -131,7 +175,12 @@ export default function LoginPage() {
           />
         </label>
         {error && <div style={{ color: "#f87171", marginBottom: 12 }}>{error}</div>}
-        <button type="submit" disabled={loading} style={{ width: "100%", padding: 10, background: "#0070f3", color: "#fff", border: "none", borderRadius: 6 }}>
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-outline-blue"
+          style={{ width: "100%" }}
+        >
           {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>

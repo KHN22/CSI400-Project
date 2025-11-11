@@ -3,7 +3,8 @@ const router = express.Router();
 const Booking = require('../models/Booking');
 const verifyToken = require('../middleware/verifyToken');
 
-// <-- INSERT this public route BEFORE any auth middleware (so it's accessible)
+
+// <-- public route stays public
 router.get('/movie/:movieId', async (req, res) => {
   try {
     const { movieId } = req.params;
@@ -19,34 +20,39 @@ router.get('/movie/:movieId', async (req, res) => {
   }
 });
 
-// All booking routes require authentication
+// <-- ENSURE all subsequent routes require authentication
 router.use(verifyToken);
 
 // GET /api/bookings  -> bookings for current user
 router.get('/', async (req, res) => {
   try {
-    const userId = req.user.id;
-    const bookings = await Booking.find({ user: userId }).sort({ createdAt: -1 });
+    // require authenticated user
+    const userId = req.user?._id || req.user?.id;
+    if (!userId) return res.status(401).json({ message: 'Please login first' });
+
+    // Query by the field used when creating bookings (userId)
+    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
     return res.json({ bookings });
   } catch (err) {
-    console.error(err);
+    console.error('[Bookings] List error:', err);
     return res.status(500).json({ message: 'server error' });
   }
 });
 
 // POST /api/bookings  -> create booking (body: { movieId, title, seats, showtime })
-router.post('/', verifyToken, async (req, res) => {
+// keep verifyToken for safety (already applied globally)
+router.post('/', async (req, res) => {
   try {
-    // เพิ่ม debug log
     console.log('[Bookings] User from token:', req.user);
-    
-    if (!req.user?._id) {
+
+    const uid = req.user?._id || req.user?.id;
+    if (!uid) {
       console.log('[Bookings] No user ID in request');
       return res.status(401).json({ message: 'Please login first' });
     }
 
     const booking = new Booking({
-      userId: req.user._id,
+      userId: uid,
       movieId: req.body.movieId,
       showtime: req.body.showtime,
       seats: req.body.seats,
@@ -57,7 +63,7 @@ router.post('/', verifyToken, async (req, res) => {
 
     console.log('[Bookings] Creating booking:', booking);
     await booking.save();
-    
+
     res.status(201).json({ booking });
   } catch (err) {
     console.error('[Bookings] Create error:', err);
@@ -85,7 +91,7 @@ router.get('/:id', async (req, res) => {
 
     // allow access only to owner or admin
     const ownerId = String(booking.userId);
-    const requesterId = String(req.user?._id);
+    const requesterId = String(req.user?._id || req.user?.id);
     const isAdmin = req.user?.role?.toLowerCase() === 'admin';
 
     if (requesterId !== ownerId && !isAdmin) {
