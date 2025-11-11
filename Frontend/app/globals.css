@@ -135,7 +135,6 @@ body {
     "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(to bottom, #0a0a0f 0%, #1a1a2e 100%);
   color: #e8e8f0;
   min-height: 100vh;
 }

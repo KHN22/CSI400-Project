@@ -14,6 +14,8 @@ const movieSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  rating: { type: Number, min: 0, max: 10, default: 0 },
+  length: { type: Number, min: 0, default: 0 },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Movie', movieSchema);

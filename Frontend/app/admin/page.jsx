@@ -26,6 +26,8 @@ export default function AdminPage() {
 
   useEffect(() => { loadUsers(); loadMovies(); }, []);
 
+  useEffect(() => {loadUsers(); loadMovies(); }, [editing])
+
   useEffect(() => {
     const editId = searchParams?.get?.("edit");
     if (!editId) return;
@@ -110,6 +112,8 @@ export default function AdminPage() {
       description: m.description || "",
       poster: m.poster || "",
       ticketPrice: m.ticketPrice || "",
+      rating: m.rating || "",
+      length: m.length || "",
       showtimes: Array.isArray(m.showtimes) ? m.showtimes : []
     });
     setPosterFile(null);
@@ -164,7 +168,9 @@ export default function AdminPage() {
         description: form.description,
         poster: posterUrl,
         ticketPrice: Number(form.ticketPrice),
-        showtimes: form.showtimes
+        showtimes: form.showtimes,
+        rating: form.rating ? Number(form.rating) : undefined,
+        length: form.length ? Number(form.length) : undefined
       };
 
       let res;
@@ -341,8 +347,10 @@ export default function AdminPage() {
                  <h3>{editing ? "Edit movie" : "Add movie"}</h3>
                  <div style={{ display: "grid", gap: 8 }}>
                    <input placeholder="Title" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} required />
-                   <input placeholder="Year" value={form.year} onChange={(e)=>setForm({...form, year:e.target.value})} />
-                   <input placeholder="Description" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
+                   <input placeholder="Rating" value={form.rating} onChange={(e)=>setForm({...form, rating:e.target.value})} type="float" step="0.5" required />
+                   <input placeholder="Gernes" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} required />
+                   <input placeholder="Length" value={form.length} onChange={(e)=>setForm({...form, length:e.target.value})} type="number" required />
+                   <input placeholder="Year" value={form.year} onChange={(e)=>setForm({...form, year:e.target.value})} type="number" required />
                    <div>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       {/* replaced visible file input with hidden input + visible button (background #6366f1) */}

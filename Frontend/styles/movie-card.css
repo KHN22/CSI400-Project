@@ -60,6 +60,20 @@
   gap: 4px;
 }
 
+.movie-rating{
+  display: flex;
+  font-size: 14px;
+  color: #ffdb81;
+  transform: translateY(-50%);
+}
+
+.movie-lenght{
+  font-size: 14px;
+  color: #a0a0b0;           
+  transform: translate(10%, -50%);
+
+}
+
 .movie-card-rating svg {
   height: 16px;
   width: 16px;
@@ -96,4 +110,24 @@
 
 .movie-card-button:hover {
   background: #4f46e5;
+}
+
+.viewBtn {
+  width: 100%;
+  padding: 8px 16px;
+  color: #ffffff;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+#viewBtn {
+  color:black;
+}
+
+#viewBtn:hover {
+  color:#ffffff;
 }
