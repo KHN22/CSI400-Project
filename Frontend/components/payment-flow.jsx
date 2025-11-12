@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { CheckCircle2, QrCode } from "lucide-react"
-import { bookingsApi } from "@/lib/api"
+import { bookingsApi, BACKEND_BASE } from "@/lib/api"
 import "../styles/payment.css"
 
 export function PaymentFlow() {

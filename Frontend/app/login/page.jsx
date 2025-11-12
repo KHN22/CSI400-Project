@@ -33,7 +33,7 @@ function LoginPageContent() {
   const [registerSuccess, setRegisterSuccess] = useState("");
 
   // use NEXT_PUBLIC_BACKEND_URL from Frontend/.env.local (fallback to localhost)
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   // login: call backend and rely on httpOnly cookie set by backend (fetch includes credentials)
   const handleSubmit = async (e) => {
