@@ -88,4 +88,9 @@ router.get('/profile', verifyToken, (req, res) => {
   res.json({ message: 'User profile endpoint' });
 });
 
+// GET /api/users/me
+router.get('/users/me', verifyToken, (req, res) => {
+  res.json({ user: req.user });
+});
+
 module.exports = router;
