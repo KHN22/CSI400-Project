@@ -52,6 +52,9 @@ function LoginPageContent() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("Response status:", res.status); // Debug Response Status
+      console.log("Response headers:", res.headers); // Debug Response Headers
+
       if (res.ok) {
         // Notify in-tab components
         try { window.dispatchEvent(new Event("auth-changed")); } catch (e) {}
@@ -62,9 +65,11 @@ function LoginPageContent() {
         router.push(from);
       } else {
         const data = await res.json().catch(() => ({}));
+        console.log("Response data:", data); // Debug Response Data
         setError(data?.message || "Login failed");
       }
     } catch (err) {
+      console.error("Fetch error:", err); // Debug Fetch Error
       setError("Network error. Please try again later.");
     } finally {
       setLoading(false);

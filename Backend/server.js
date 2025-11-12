@@ -16,7 +16,6 @@ const app = express();
 // อนุญาต Domains ที่กำหนด
 const allowedOrigins = [
   'https://csi-400-project.vercel.app', // Frontend Domain
-  'https://csi-400-project-git-main-khingza002-gmailcoms-projects.vercel.app', // Frontend Domain (Git Branch)
   'http://localhost:3000', // สำหรับการพัฒนาใน Local
 ];
 
