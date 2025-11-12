@@ -3,18 +3,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/buttons.css";
-
-const fetchUser = async () => {
-  const res = await fetch(`${BACKEND_BASE}/api/auth/me`, {
-    method: "GET",
-    credentials: "include", // สำคัญ: ส่ง Cookies ไปกับ Request
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch user');
-  }
-  return await res.json();
-};
+import { BACKEND_BASE } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,8 +26,6 @@ function LoginPageContent() {
   const [error, setError] = useState("");
   const [user, setUser] = useState(null);
 
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -59,7 +46,12 @@ function LoginPageContent() {
       });
 
       console.log("Response status:", res.status); // Debug Response Status
-      console.log("Response headers:", res.headers); // Debug Response Headers
+      // ลองอ่าน Set-Cookie header (บางเบราว์เซอร์/Fetch ไม่ expose it)
+      try {
+        for (const pair of res.headers.entries()) {
+          console.log("header:", pair);
+        }
+      } catch (e) {}
 
       if (res.ok) {
         // Notify in-tab components
@@ -85,28 +77,36 @@ function LoginPageContent() {
   useEffect(() => {
     let isMounted = true;
 
-    fetchUser()
-      .then((data) => {
-        if (isMounted) {
+    // พยายามดึง user แต่ถ้าไม่สำเร็จ จะไม่บล็อกหน้าจอ Login
+    (async () => {
+      try {
+        const res = await fetch(`${BACKEND_BASE}/api/auth/me`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          console.log("fetch user not ok:", res.status);
+          return; // ไม่เซ็ต error เพื่อไม่ให้บล็อก UI
+        }
+
+        const data = await res.json();
+        if (isMounted && data?.user) {
           console.log("Fetched user data:", data); // Debug User Data
           setUser(data.user);
         }
-      })
-      .catch((err) => {
-        console.error("Error fetching user:", err); // Debug Fetch Error
-        if (isMounted) setError("Failed to load user data.");
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
+      } catch (err) {
+        console.error("Error fetching user (non-fatal):", err); // Debug Fetch Error
+        // ไม่เซ็ต error เพื่อให้หน้า Login สามารถใช้งานได้เสมอ
+      }
+    })();
 
     return () => {
       isMounted = false; // Cleanup function
     };
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  // แสดงฟอร์มเสมอ — อย่าให้การ fetch user บล็อกการเข้าถึงหน้า Login
   return (
     <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: "#111827" }}>
       <h1 style={{ marginBottom: 16, fontSize: 24, fontWeight: 500, color: "#fff" }}>Login</h1>
