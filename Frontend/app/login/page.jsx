@@ -41,30 +41,16 @@ function LoginPageContent() {
       const res = await fetch(`${BACKEND_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // ส่ง Cookies ไปกับ Request
         body: JSON.stringify({ email, password }),
       });
 
-      console.log("Response status:", res.status); // Debug Response Status
-      // ลองอ่าน Set-Cookie header (บางเบราว์เซอร์/Fetch ไม่ expose it)
-      try {
-        for (const pair of res.headers.entries()) {
-          console.log("header:", pair);
-        }
-      } catch (e) {}
-
       if (res.ok) {
-        // Notify in-tab components
-        try { window.dispatchEvent(new Event("auth-changed")); } catch (e) {}
-        // Notify other tabs (cross-tab)
-        try { localStorage.setItem("auth", String(Date.now())); } catch (e) {}
-        try { new BroadcastChannel("auth").postMessage("changed"); } catch (e) {}
-        // redirect after notifying
-        router.push(from); // ใช้ router ที่ดึงมาจาก useRouter()
+        const data = await res.json();
+        localStorage.setItem("token", data.token); // Store token in localStorage
+        router.push("/"); // Redirect to homepage
       } else {
-        const data = await res.json().catch(() => ({}));
-        console.log("Response data:", data); // Debug Response Data
-        setError(data?.message || "Login failed");
+        const data = await res.json();
+        setError(data.message || "Login failed");
       }
     } catch (err) {
       console.error("Fetch error:", err); // Debug Fetch Error

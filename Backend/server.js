@@ -20,16 +20,18 @@ const allowedOrigins = [
   'http://localhost:3000',
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true, // สำคัญ: อนุญาตให้ส่ง Cookies และ Headers ข้าม Domain
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Allow cookies and Authorization header
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 

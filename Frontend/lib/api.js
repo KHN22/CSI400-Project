@@ -3,7 +3,7 @@ import { mockMovies, mockBookings, mockUser } from "./mock-data"
 // Simulated API delay
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "https://csi-400-project.onrender.com";
+export const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "https://csi400-project.onrender.com";
 
 export const moviesApi = {
   getAll: async () => {
@@ -66,6 +66,28 @@ export const userApi = {
     return mockUser
   },
 }
+
+// Helper function to include Authorization header
+export const fetchWithAuth = async (url, options = {}) => {
+  const token = localStorage.getItem("token"); // Retrieve token from localStorage
+  const headers = {
+    ...options.headers,
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+
+  const response = await fetch(`${BACKEND_BASE}${url}`, {
+    ...options,
+    headers,
+    credentials: "include", // Ensure cookies are sent
+  });
+
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  return response.json();
+};
 
 // ตัวอย่างฟังก์ชันสำหรับ Fetch API
 export async function fetchBookings() {
