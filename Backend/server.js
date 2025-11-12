@@ -2,21 +2,22 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const moviesRoutes = require('./routes/movies');
 const adminRoutes = require('./routes/admin');
-const bookingsRoutes = require('./routes/bookings'); // new
-const uploadsRoutes = require('./routes/uploads'); // added
-const changeProfiles = require('./routes/profiles');
+const bookingsRoutes = require('./routes/bookings');
+const uploadsRoutes = require('./routes/uploads');
+const profilesRoutes = require('./routes/profiles');
 
 const app = express();
 
 // อนุญาต Domains ที่กำหนด
 const allowedOrigins = [
-  'https://csi-400-project.vercel.app', // Frontend Domain
-  'http://localhost:3000', // สำหรับการพัฒนาใน Local
+  'https://csi-400-project.vercel.app',
+  'http://localhost:3000',
 ];
 
 app.use(cors({
@@ -30,7 +31,7 @@ app.use(cors({
   credentials: true, // สำคัญ: อนุญาตให้ส่ง Cookies และ Headers ข้าม Domain
 }));
 app.use(express.json());
-app.use(require('cookie-parser')());
+app.use(cookieParser());
 
 // serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
@@ -40,8 +41,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/movies', moviesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookings', bookingsRoutes);
-app.use('/api/uploads', uploadsRoutes); // new
-app.use('/api/auth/avatar', changeProfiles);
+app.use('/api/uploads', uploadsRoutes);
+app.use('/api/auth/avatar', profilesRoutes);
 
 const PORT = process.env.PORT || 4000;
 
