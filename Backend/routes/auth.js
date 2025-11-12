@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
 
     res.cookie('sid', token, {
       httpOnly: true,
-      secure: true, // ใช้ Secure ใน Production
+      secure: process.env.NODE_ENV === 'production', // ใช้ Secure ใน Production
       sameSite: 'None', // รองรับ Cross-Site Cookies
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 วัน
@@ -63,8 +63,13 @@ router.post('/login', async (req, res) => {
 
 // logout
 router.post('/logout', (req, res) => {
-  res.clearCookie(COOKIE_NAME, { path: '/' });
-  return res.json({ message: 'logged out' });
+  res.clearCookie('sid', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None',
+    path: '/',
+  });
+  res.status(204).send(); // ส่ง Response 204 (No Content)
 });
 
 // ตรวจสอบสถานะการล็อกอิน (frontend เรียก /api/auth/check)

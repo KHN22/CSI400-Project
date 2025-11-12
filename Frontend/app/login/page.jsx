@@ -1,8 +1,20 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/buttons.css";
+
+const fetchUser = async () => {
+  const res = await fetch(`${BACKEND_BASE}/api/auth/me`, {
+    method: "GET",
+    credentials: "include", // สำคัญ: ส่ง Cookies ไปกับ Request
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch user');
+  }
+  return await res.json();
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,6 +35,7 @@ function LoginPageContent() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [user, setUser] = useState(null);
 
   const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -35,6 +48,9 @@ function LoginPageContent() {
     }
     setLoading(true);
     try {
+      console.log("Sending login request to:", `${BACKEND_BASE}/api/auth/login`); // Debug URL
+      console.log("Request body:", { email, password }); // Debug Request Body
+
       const res = await fetch(`${BACKEND_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,6 +82,31 @@ function LoginPageContent() {
     }
   };
 
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchUser()
+      .then((data) => {
+        if (isMounted) {
+          console.log("Fetched user data:", data); // Debug User Data
+          setUser(data.user);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching user:", err); // Debug Fetch Error
+        if (isMounted) setError("Failed to load user data.");
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false; // Cleanup function
+    };
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
   return (
     <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: "#111827" }}>
       <h1 style={{ marginBottom: 16, fontSize: 24, fontWeight: 500, color: "#fff" }}>Login</h1>
@@ -100,6 +141,7 @@ function LoginPageContent() {
           {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
+      {user && <div style={{ color: "#fff", marginTop: 16 }}>Welcome, {user.name}!</div>}
     </div>
   );
 }
