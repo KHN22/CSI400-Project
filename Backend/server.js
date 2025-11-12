@@ -14,16 +14,23 @@ const profilesRoutes = require('./routes/profiles');
 
 const app = express();
 
-// อนุญาต Domains ที่กำหนด
+// Dynamically allow origins based on environment variables or patterns
 const allowedOrigins = [
-  'https://csi-400-project.vercel.app',
-  'http://localhost:3000',
+  process.env.CLIENT_URL, // Main frontend URL
 ];
+
+// Allow Vercel preview domains (*.vercel.app)
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true; // Allow non-browser requests (e.g., Postman)
+  return (
+    allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin) // Allow Vercel preview domains
+  );
+};
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -32,13 +39,14 @@ app.use(
     credentials: true, // Allow cookies and Authorization header
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
-// serve uploaded files
+// Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
-// api routes
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', moviesRoutes);
 app.use('/api/admin', adminRoutes);
@@ -48,12 +56,15 @@ app.use('/api/auth/avatar', profilesRoutes);
 
 const PORT = process.env.PORT || 4000;
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('MongoDB connected');
-  app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
-}).catch(err => {
-  console.error('MongoDB connection error:', err.message);
-});
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('MongoDB connected');
+    app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err.message);
+  });
