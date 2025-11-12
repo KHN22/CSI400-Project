@@ -13,9 +13,21 @@ const changeProfiles = require('./routes/profiles');
 
 const app = express();
 
+// อนุญาต Domains ที่กำหนด
+const allowedOrigins = [
+  'https://csi400-project.vercel.app', // Frontend Domain
+  'http://localhost:3000', // สำหรับการพัฒนาใน Local
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000',  // frontend origin
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // อนุญาตให้ส่ง Cookies และ Headers ข้าม Domain
 }));
 app.use(express.json());
 app.use(require('cookie-parser')());

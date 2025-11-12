@@ -47,11 +47,12 @@ router.post('/login', async (req, res) => {
     // include role in token payload
     const token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
-    res.cookie(COOKIE_NAME, token, {
+    res.cookie('sid', token, {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      secure: process.env.NODE_ENV === 'production', // ใช้ Secure ใน Production
+      sameSite: 'None', // รองรับ Cross-Site Cookies
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 วัน
     });
 
     return res.json({ message: 'ok' });
