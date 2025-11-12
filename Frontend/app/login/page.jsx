@@ -1,10 +1,20 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/buttons.css";
 
 export default function LoginPage() {
   const router = useRouter();
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
+  );
+}
+
+function LoginPageContent() {
   const searchParams = useSearchParams();
   const from = searchParams?.get("from") || "/";
 

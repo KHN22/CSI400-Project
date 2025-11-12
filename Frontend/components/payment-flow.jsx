@@ -1,15 +1,43 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import React, { useEffect, useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { CheckCircle2, QrCode } from "lucide-react"
 import { bookingsApi } from "@/lib/api"
 import "../styles/payment.css"
 
-export function PaymentFlow({ bookingData }) {
+export function PaymentFlow() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentFlowContent />
+    </Suspense>
+  )
+}
+
+function PaymentFlowContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const bookingId = searchParams.get("bookingId")
+
   const [isPaying, setIsPaying] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [bookingData, setBookingData] = useState(null)
+
+  useEffect(() => {
+    // Fetch booking data using bookingId
+    const fetchBookingData = async () => {
+      try {
+        const data = await bookingsApi.getBooking(bookingId)
+        setBookingData(data)
+      } catch (error) {
+        console.error("Error fetching booking data:", error)
+      }
+    }
+
+    if (bookingId) {
+      fetchBookingData()
+    }
+  }, [bookingId])
 
   const handlePayment = async () => {
     setIsPaying(true)
@@ -81,6 +109,10 @@ export function PaymentFlow({ bookingData }) {
         </button>
       </div>
     )
+  }
+
+  if (!bookingData) {
+    return <div>Loading booking details...</div>
   }
 
   return (

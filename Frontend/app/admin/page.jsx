@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/movie-details.css";
 
@@ -7,6 +8,40 @@ const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:40
 const FIXED_SHOWTIMES = ["10:00", "13:00", "16:00", "19:00", "22:00"];
 
 export default function AdminPage() {
+  const router = useRouter();
+  const fileRef = useRef();
+  const createFormRef = useRef(null);
+
+  const [query, setQuery] = useState("");
+  const [users, setUsers] = useState([]);
+  const [uLoading, setULoading] = useState(false);
+  const [uError, setUError] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [mLoading, setMLoading] = useState(true);
+  const [mError, setMError] = useState("");
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ title: "", year: "", description: "", poster: "", ticketPrice: "", showtimes: [] });
+  const [posterFile, setPosterFile] = useState(null);
+  const [posterPreview, setPosterPreview] = useState("");
+
+  useEffect(() => {
+    loadUsers();
+    loadMovies();
+  }, []);
+
+  useEffect(() => {
+    loadUsers();
+    loadMovies();
+  }, [editing]);
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminPageContent />
+    </Suspense>
+  );
+}
+
+function AdminPageContent() {
   const router = useRouter();
   const fileRef = useRef();
   const createFormRef = useRef(null);
