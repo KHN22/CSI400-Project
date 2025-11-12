@@ -3,7 +3,7 @@ import { mockMovies, mockBookings, mockUser } from "./mock-data"
 // Simulated API delay
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "https://csi400-project.onrender.com";
+export const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "https://csi-400-project.onrender.com";
 
 export const moviesApi = {
   getAll: async () => {
