@@ -100,3 +100,19 @@ export async function fetchLogin(email, password) {
 
   return await res.json();
 }
+
+export async function fetchBookingsWithToken(token) {
+  const res = await fetch(`${BACKEND_BASE}/api/bookings`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`, // ส่ง Bearer Token
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch bookings');
+  }
+
+  return await res.json();
+}
