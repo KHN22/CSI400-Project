@@ -7,6 +7,22 @@ import { bookingsApi } from "@/lib/api"
 import "../styles/payment.css"
 
 export function PaymentFlow() {
+  const fetchBookingDetails = async (bookingId) => {
+    const res = await fetch(`${BACKEND_BASE}/api/bookings/${bookingId}`, {
+      method: "GET",
+      credentials: "include", // สำคัญ: ส่ง Cookies ไปกับ Request
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch booking details")
+    }
+
+    return await res.json()
+  }
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <PaymentFlowContent />

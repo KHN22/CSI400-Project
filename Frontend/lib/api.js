@@ -66,3 +66,37 @@ export const userApi = {
     return mockUser
   },
 }
+
+// ตัวอย่างฟังก์ชันสำหรับ Fetch API
+export async function fetchBookings() {
+  const res = await fetch(`${BACKEND_BASE}/api/bookings`, {
+    method: 'GET',
+    credentials: 'include', // สำคัญ: ส่ง Cookies ไปกับ Request
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch bookings');
+  }
+
+  return await res.json();
+}
+
+export async function fetchLogin(email, password) {
+  const res = await fetch(`${BACKEND_BASE}/api/auth/login`, {
+    method: 'POST',
+    credentials: 'include', // สำคัญ: ส่ง Cookies ไปกับ Request
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to login');
+  }
+
+  return await res.json();
+}

@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
 
     res.cookie('sid', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // ใช้ Secure ใน Production
+      secure: true, // ใช้ Secure ใน Production
       sameSite: 'None', // รองรับ Cross-Site Cookies
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 วัน

@@ -6,7 +6,7 @@ module.exports = function verifyToken(req, res, next) {
 
   if (!token) {
     console.log('[verifyToken] No token found');
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(401).json({ message: 'Please login first' });
   }
 
   try {
