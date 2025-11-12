@@ -27,7 +27,7 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true, // อนุญาตให้ส่ง Cookies และ Headers ข้าม Domain
+  credentials: true, // สำคัญ: อนุญาตให้ส่ง Cookies และ Headers ข้าม Domain
 }));
 app.use(express.json());
 app.use(require('cookie-parser')());

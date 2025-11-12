@@ -36,16 +36,15 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: 'email and password required' });
+    if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'invalid credentials' });
+    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) return res.status(401).json({ message: 'invalid credentials' });
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    // include role in token payload
-    const token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || 'dev_secret', { expiresIn: '7d' });
 
     res.cookie('sid', token, {
       httpOnly: true,
@@ -55,10 +54,10 @@ router.post('/login', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 วัน
     });
 
-    return res.json({ message: 'ok' });
+    res.json({ message: 'Login successful' });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'server error' });
+    console.error('[Login] Error:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

@@ -1,22 +1,21 @@
 const jwt = require('jsonwebtoken');
 
-const verifyToken = (req, res, next) => {
-  try {
-    const token = req.cookies?.token;
-    if (!token) return res.status(401).json({ message: 'No token provided' });
+module.exports = function verifyToken(req, res, next) {
+  const token = req.cookies?.sid; // ดึง token จาก Cookies
+  console.log('[verifyToken] Token:', token); // Debug token
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // map payload fields -> req.user
-    req.user = {
-      _id: decoded.sub || decoded._id || decoded.id,
-      email: decoded.email,
-      role: decoded.role
-    };
+  if (!token) {
+    console.log('[verifyToken] No token found');
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
+    console.log('[verifyToken] Payload:', payload); // Debug payload
+    req.user = payload; // เก็บข้อมูลผู้ใช้ใน req.user
     next();
   } catch (err) {
-    console.error('Token verification error:', err);
-    res.status(401).json({ message: 'Invalid token' });
+    console.error('[verifyToken] Token verification failed:', err);
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 };
-
-module.exports = verifyToken;
