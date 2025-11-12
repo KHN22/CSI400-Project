@@ -116,3 +116,19 @@ export async function fetchBookingsWithToken(token) {
 
   return await res.json();
 }
+
+export async function fetchUserProfile() {
+  const res = await fetch(`${BACKEND_BASE}/api/auth/profile`, {
+    method: 'GET',
+    credentials: 'include', // สำคัญ: ส่ง Cookies ไปกับ Request
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch user profile');
+  }
+
+  return await res.json();
+}

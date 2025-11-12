@@ -73,17 +73,7 @@ router.get('/check', verifyToken, (req, res) => {
   res.json({ user: req.user });
 });
 
-// GET /api/auth/me(old)
-// Add this endpoint so frontend can GET /api/auth/me
-// router.get('/me', verifyToken, async (req, res) => {
-//   // verifyToken must set req.user
-//   const { _id } = req.user;
-//   const user = await User.findOne({ _id });
-//   console.log(user.profileImage);
-//   console.log(req.user._id);
-//   res.json({ user: req.user });
-// });
-
+// GET /api/auth/me
 router.get('/me', verifyToken, async (req, res) => {
   try {
     // req.user._id was set by verifyToken
@@ -112,5 +102,9 @@ router.get('/me', verifyToken, async (req, res) => {
   }
 });
 
+// GET /api/auth/profile
+router.get('/profile', verifyToken, (req, res) => {
+  res.json({ message: 'User profile endpoint' });
+});
 
 module.exports = router;

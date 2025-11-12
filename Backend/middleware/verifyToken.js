@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = function verifyToken(req, res, next) {
-  // ตรวจสอบ Token จาก Cookies หรือ Authorization Header
   const token = req.cookies?.sid || req.headers.authorization?.split(' ')[1];
   console.log('[verifyToken] Token:', token); // Debug token
 
