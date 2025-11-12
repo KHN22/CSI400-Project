@@ -15,6 +15,7 @@ export default function LoginPage() {
 }
 
 function LoginPageContent() {
+  const router = useRouter(); // เพิ่มการดึง router
   const searchParams = useSearchParams();
   const from = searchParams?.get("from") || "/";
 
@@ -22,20 +23,9 @@ function LoginPageContent() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showRegister, setShowRegister] = useState(false);
-  const [registerData, setRegisterData] = useState({
-    username: "",
-    password: "",
-    email: "",
-    confirmPassword: "",
-  });
-  const [registerError, setRegisterError] = useState("");
-  const [registerSuccess, setRegisterSuccess] = useState("");
 
-  // ใช้ NEXT_PUBLIC_BACKEND_URL จาก .env.local
   const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  // login: call backend and rely on httpOnly cookie set by backend (fetch includes credentials)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -62,7 +52,7 @@ function LoginPageContent() {
         try { localStorage.setItem("auth", String(Date.now())); } catch (e) {}
         try { new BroadcastChannel("auth").postMessage("changed"); } catch (e) {}
         // redirect after notifying
-        router.push(from);
+        router.push(from); // ใช้ router ที่ดึงมาจาก useRouter()
       } else {
         const data = await res.json().catch(() => ({}));
         console.log("Response data:", data); // Debug Response Data
