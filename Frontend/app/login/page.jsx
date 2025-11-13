@@ -77,17 +77,28 @@ function LoginPageContent() {
 
       // verify server session by fetching profile (ensure cookie recognized)
       try {
-        const meRes = await fetch(`${BACKEND_BASE}/api/auth/me`, {
+        // ask server to verify token/session and, if configured, return redirect info
+        const meRes = await fetch(`${BACKEND_BASE}/api/auth/me?redirect=1`, {
           method: "GET",
           credentials: "include",
+          headers: { "Content-Type": "application/json" },
         });
         if (!meRes.ok) {
-          // If profile check fails, surface an error instead of silently staying on login
           const errData = await meRes.json().catch(() => ({}));
           setError(errData.message || "Login succeeded but session not established. Try again.");
           setLoading(false);
           return;
         }
+        const meData = await meRes.json().catch(() => ({}));
+        // if server asked client to redirect (verify endpoint returned redirect), use it
+        if (meData && meData.redirect) {
+          const target = meData.redirect || "/";
+          router.replace(target);
+          try { router.refresh && router.refresh(); } catch (err) {}
+          setTimeout(() => { if (typeof window !== "undefined") window.location.replace(target); }, 250);
+          return;
+        }
+        // otherwise continue with existing redirectTo logic
       } catch (err) {
         console.error("Profile check failed after login:", err);
         setError("Login succeeded but verification failed. Try refreshing the page.");
