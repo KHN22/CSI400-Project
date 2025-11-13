@@ -19,7 +19,24 @@ function LoginPageContent() {
   const router = useRouter(); // เพิ่มการดึง router
   const searchParams = useSearchParams();
   // support redirect param (used elsewhere) and legacy from
-  const redirectTo = searchParams?.get("redirect") || searchParams?.get("from") || "/";
+  // const redirectTo = searchParams?.get("redirect") || searchParams?.get("from") || "/";
+  // const redirectTo = "/";
+
+  // helper: normalize redirect to a path (strip origin) and default to "/"
+  function normalizeRedirect(target) {
+    if (!target) return "/";
+    try {
+      // if full URL, use pathname + search + hash
+      const u = new URL(target, typeof window !== "undefined" ? window.location.origin : undefined);
+      return (u.pathname || "/") + (u.search || "") + (u.hash || "");
+    } catch {
+      // not a full URL, ensure it starts with "/"
+      return target.startsWith("/") ? target : `/${target}`;
+    }
+  }
+
+  const redirectToRaw = searchParams?.get("redirect") || searchParams?.get("from") || "/";
+  const redirectTo = normalizeRedirect(redirectToRaw);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +56,7 @@ function LoginPageContent() {
       console.log("Sending login request to:", `${BACKEND_BASE}/api/auth/login`); // Debug URL
       console.log("Request body:", { email, password }); // Debug Request Body
 
-      // include credentials so backend can set auth cookie
+      // login request (allow cookie set by backend)
       const res = await fetch(`${BACKEND_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -47,30 +64,49 @@ function LoginPageContent() {
         credentials: "include",
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("token", data.token); // Store token in localStorage
-
-        // navigate client-side first
-        router.replace(redirectTo);
-
-        // try to refresh Next server components / cached data
-        try { router.refresh && router.refresh(); } catch (err) { /* ignore */ }
-
-        // As a robust fallback, force a full reload to ensure cookies and server state are applied
-        // (use replace to avoid leaving a login entry in history)
-        setTimeout(() => {
-          if (typeof window !== "undefined") {
-            window.location.replace(redirectTo || "/");
-          }
-        }, 250);
-
-      } else {
-        const data = await res.json().catch(()=>({}));
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
         setError(data.message || "Login failed");
+        setLoading(false);
+        return;
       }
+
+      const data = await res.json().catch(() => ({}));
+      // store token if provided (optional)
+      if (data.token) localStorage.setItem("token", data.token);
+
+      // verify server session by fetching profile (ensure cookie recognized)
+      try {
+        const meRes = await fetch(`${BACKEND_BASE}/api/auth/me`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!meRes.ok) {
+          // If profile check fails, surface an error instead of silently staying on login
+          const errData = await meRes.json().catch(() => ({}));
+          setError(errData.message || "Login succeeded but session not established. Try again.");
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Profile check failed after login:", err);
+        setError("Login succeeded but verification failed. Try refreshing the page.");
+        setLoading(false);
+        return;
+      }
+
+      // navigation: replace route and attempt to refresh; fallback to hard replace
+      router.replace(redirectTo);
+      try { router.refresh && router.refresh(); } catch (err) { /* ignore */ }
+      setTimeout(() => {
+        if (typeof window !== "undefined") {
+          // use replace to avoid leaving login in history
+          window.location.replace(redirectTo || "/");
+        }
+      }, 250);
+
     } catch (err) {
-      console.error("Fetch error:", err); // Debug Fetch Error
+      console.error("Fetch error:", err);
       setError("Network error. Please try again later.");
     } finally {
       setLoading(false);
