@@ -13,9 +13,19 @@ export default function HomePage() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
+        // include token from localStorage as Authorization header if present
+        const token =
+          typeof window !== "undefined"
+            ? localStorage.getItem("token")
+            : null;
+        const headers = token
+          ? { Authorization: `Bearer ${token}` }
+          : { "Content-Type": "application/json" };
+
         const res = await fetch(`${BACKEND_BASE}/api/movies`, {
           method: "GET",
           credentials: "include",
+          headers,
         });
 
         if (!res.ok) {
@@ -42,7 +52,9 @@ export default function HomePage() {
     <div className="home-container">
       <div className="home-header">
         <h1 className="home-title">Now Showing</h1>
-        <p className="home-subtitle">Book your tickets for the latest blockbusters</p>
+        <p className="home-subtitle">
+          Book your tickets for the latest blockbusters
+        </p>
       </div>
       <MovieGrid movies={movies} />
     </div>

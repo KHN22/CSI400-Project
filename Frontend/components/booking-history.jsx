@@ -1,14 +1,13 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { bookingsApi } from "@/lib/api"
+import { bookingsApi, BACKEND_BASE } from "@/lib/api"
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react"
 import "../styles/booking-history.css"
 
 export default function BookingHistory() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
 
   useEffect(() => {
     let mounted = true
@@ -68,4 +67,5 @@ export default function BookingHistory() {
       </ul>
     </div>
   )
+}
 }

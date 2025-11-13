@@ -1,10 +1,9 @@
 "use client";
-
 import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/movie-details.css";
+import { BACKEND_BASE } from "@/lib/api";
 
-const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 const FIXED_SHOWTIMES = ["10:00", "13:00", "16:00", "19:00", "22:00"];
 
 export default function AdminPage() {

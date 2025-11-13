@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react"
 import "@/styles/booking-history.css"
+import { BACKEND_BASE } from "@/lib/api";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
   const router = useRouter()
 
   function looksLikeObjectId(s) {
