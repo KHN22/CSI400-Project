@@ -18,7 +18,8 @@ export default function LoginPage() {
 function LoginPageContent() {
   const router = useRouter(); // เพิ่มการดึง router
   const searchParams = useSearchParams();
-  const from = searchParams?.get("from") || "/";
+  // support redirect param (used elsewhere) and legacy from
+  const redirectTo = searchParams?.get("redirect") || searchParams?.get("from") || "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,16 +39,19 @@ function LoginPageContent() {
       console.log("Sending login request to:", `${BACKEND_BASE}/api/auth/login`); // Debug URL
       console.log("Request body:", { email, password }); // Debug Request Body
 
+      // include credentials so backend can set auth cookie
       const res = await fetch(`${BACKEND_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem("token", data.token); // Store token in localStorage
-        router.push("/"); // Redirect to homepage
+        // Redirect to requested path (replace so back doesn't return to login)
+        router.replace(redirectTo);
       } else {
         const data = await res.json();
         setError(data.message || "Login failed");
