@@ -48,6 +48,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // API routes
 app.use('/api/auth', authRoutes);
+// Support legacy/alternate client calls that expect /api/users/* (maps to same auth handlers)
+app.use('/api/users', authRoutes);
 app.use('/api/movies', moviesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookings', bookingsRoutes);

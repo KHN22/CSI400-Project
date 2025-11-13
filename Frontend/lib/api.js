@@ -140,7 +140,7 @@ export async function fetchBookingsWithToken(token) {
 }
 
 export async function fetchUserProfile() {
-  const res = await fetch(`${BACKEND_BASE}/api/auth/profile`, {
+  const res = await fetch(`${BACKEND_BASE}/api/auth/me`, {
     method: 'GET',
     credentials: 'include', // สำคัญ: ส่ง Cookies ไปกับ Request
     headers: {
@@ -153,4 +153,19 @@ export async function fetchUserProfile() {
   }
 
   return await res.json();
+}
+
+export async function fetchLogout() {
+  const res = await fetch(`${BACKEND_BASE}/api/auth/logout`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    const err = await res.text().catch(()=>null);
+    throw new Error(err || 'Logout failed');
+  }
+  // remove stored token locally as well
+  try { localStorage.removeItem('token'); } catch (e) {}
+  return await res.json().catch(()=>({ ok: true }));
 }
