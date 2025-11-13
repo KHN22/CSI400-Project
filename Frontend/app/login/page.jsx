@@ -50,10 +50,23 @@ function LoginPageContent() {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem("token", data.token); // Store token in localStorage
-        // Redirect to requested path (replace so back doesn't return to login)
+
+        // navigate client-side first
         router.replace(redirectTo);
+
+        // try to refresh Next server components / cached data
+        try { router.refresh && router.refresh(); } catch (err) { /* ignore */ }
+
+        // As a robust fallback, force a full reload to ensure cookies and server state are applied
+        // (use replace to avoid leaving a login entry in history)
+        setTimeout(() => {
+          if (typeof window !== "undefined") {
+            window.location.replace(redirectTo || "/");
+          }
+        }, 250);
+
       } else {
-        const data = await res.json();
+        const data = await res.json().catch(()=>({}));
         setError(data.message || "Login failed");
       }
     } catch (err) {
