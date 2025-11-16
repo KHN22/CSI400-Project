@@ -53,7 +53,7 @@ export default function PaymentPage() {
       if (id === "draft") {
         const check = await fetch(`${BACKEND_BASE}/api/auth/check`, { credentials: "include" });
         if (!check.ok) {
-          router.push(`/login?redirect=/payment/draft`);
+          try { window.alert("Please Login first"); } catch(e){}
           return;
         }
 
