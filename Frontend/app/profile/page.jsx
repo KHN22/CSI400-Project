@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import "@/styles/profile.css";
+import { BACKEND_BASE } from "@/lib/api";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -13,7 +14,6 @@ export default function ProfilePage() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
   const router = useRouter();
   const fileInputRef = useRef(null);
 

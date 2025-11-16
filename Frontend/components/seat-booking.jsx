@@ -8,7 +8,7 @@ import "../styles/seat-booking.css";
 const ROWS = ["A", "B", "C", "D", "E", "F"];
 const SEATS_PER_ROW = 8;
 
-const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+import { BACKEND_BASE } from "../lib/api";
 
 export default function SeatBooking(props) {
   const { movie, showtime: initialShowtime, showtimes } = props;
@@ -71,7 +71,7 @@ export default function SeatBooking(props) {
 
     try {
       // ตรวจสอบว่าล็อกอินอยู่ ถ้าไม่อยู่ให้ไปหน้า login (preserve redirect)
-      const check = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}/api/auth/check`, {
+      const check = await fetch(`${BACKEND_BASE}/api/auth/check`, {
         credentials: "include"
       });
 

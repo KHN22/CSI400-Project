@@ -2,10 +2,10 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import "@/styles/buttons.css";
+import { BACKEND_BASE } from "../lib/api";
 
 export default function LogoutButton() {
   const router = useRouter();
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
   const handleLogout = async () => {
     try {

@@ -13,9 +13,21 @@ const changeProfiles = require('./routes/profiles');
 
 const app = express();
 
+// Configure CORS to allow the frontend (including Vercel previews) and support credentials
+const allowedOrigins = [process.env.CLIENT_URL || 'http://localhost:3000'];
+const vercelPreviewRegex = /\.vercel\.app$/;
+
 app.use(cors({
-  origin: 'http://localhost:3000',  // frontend origin
-  credentials: true
+  origin: function(origin, callback) {
+    // allow requests with no origin (e.g., curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+    if (vercelPreviewRegex.test(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(require('cookie-parser')());

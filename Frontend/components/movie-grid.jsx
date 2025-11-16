@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { MovieCard } from "@/components/movie-card";
 import "../styles/movie-card.css";
-
-const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+import { BACKEND_BASE } from "../lib/api";
 console.log("[MovieGrid] BACKEND_BASE:", BACKEND_BASE);
 
 export function MovieGrid() {

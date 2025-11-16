@@ -47,10 +47,12 @@ router.post('/login', async (req, res) => {
     // include role in token payload
     const token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
+    // set httpOnly cookie for browser sessions; for cross-site cookies we need SameSite=None and Secure in production
     res.cookie(COOKIE_NAME, token, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'None',
       secure: process.env.NODE_ENV === 'production',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -63,7 +65,8 @@ router.post('/login', async (req, res) => {
 
 // logout
 router.post('/logout', (req, res) => {
-  res.clearCookie(COOKIE_NAME, { path: '/' });
+  // clear cookie using same options used when setting it
+  res.clearCookie(COOKIE_NAME, { path: '/', httpOnly: true, sameSite: 'None', secure: process.env.NODE_ENV === 'production' });
   return res.json({ message: 'logged out' });
 });
 

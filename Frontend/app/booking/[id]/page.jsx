@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import SeatBooking from "@/components/seat-booking";
-
-const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+import { BACKEND_BASE } from "@/lib/api";
 
 export default function BookingPage() {
   const { id } = useParams();

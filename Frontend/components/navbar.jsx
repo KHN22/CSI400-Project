@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import AuthStatus from "./auth-status";
 import LogoutButton from "./logout-button";
 import "../styles/navbar.css";
+import { BACKEND_BASE } from "../lib/api";
 
 export function Navbar() {
   const [user, setUser] = useState(null);
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
   // centralized fetch user function
   async function loadUser() {

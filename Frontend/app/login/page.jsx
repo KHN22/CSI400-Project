@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/buttons.css";
+import { BACKEND_BASE } from "../../lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,8 +23,7 @@ export default function LoginPage() {
   const [registerError, setRegisterError] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState("");
 
-  // use NEXT_PUBLIC_BACKEND_URL from Frontend/.env.local (fallback to localhost)
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+  // BACKEND_BASE imported from centralized lib
 
   // login: call backend and rely on httpOnly cookie set by backend (fetch includes credentials)
   const handleSubmit = async (e) => {
@@ -55,7 +55,7 @@ export default function LoginPage() {
         setError(data?.message || "Login failed");
       }
     } catch (err) {
-      setError("Network error. Ensure backend is running on port 4000.");
+      setError("Network error. Ensure backend is reachable.");
     } finally {
       setLoading(false);
     }

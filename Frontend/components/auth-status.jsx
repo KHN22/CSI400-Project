@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { BACKEND_BASE } from "@/lib/api";
 
 export default function AuthStatus() {
-  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
