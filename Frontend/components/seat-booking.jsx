@@ -76,8 +76,8 @@ export default function SeatBooking(props) {
       });
 
       if (!check.ok) {
-        // redirect to login, keep return path
-        router.push(`/login?redirect=/movie/${movie._id || movie.id}`);
+        // not logged in -> show a popup and abort booking flow
+        try { window.alert("Please Login first"); } catch (e) {}
         return;
       }
 

@@ -44,7 +44,14 @@ export default function BookingsPage() {
       setError("")
       try {
         const res = await fetch(`${BACKEND_BASE}/api/bookings`, { credentials: "include" })
-        if (res.status === 401) { router.push("/login"); return }
+        if (res.status === 401) {
+          // not authenticated: show empty bookings (user not signed in)
+          if (mounted) {
+            setBookings([])
+            setLoading(false)
+          }
+          return
+        }
         if (!res.ok) { setError("Failed to load bookings"); return }
         const d = await res.json()
         const raw = d.bookings || []

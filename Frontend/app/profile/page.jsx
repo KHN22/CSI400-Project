@@ -25,7 +25,8 @@ export default function ProfilePage() {
           credentials: "include",
         });
         if (res.status === 401) {
-          router.push("/login");
+          // not authenticated: leave user as null so UI shows 'Not signed in.'
+          if (mounted) setUser(null)
           return;
         }
         const d = await res.json();

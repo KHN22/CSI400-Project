@@ -21,9 +21,15 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // public pages that do not require auth
+  // public pages and prefixes that do not require auth
   const publicPages = ["/login", "/register", "/signup", "/auth/callback"];
-  if (publicPages.includes(pathname)) {
+  const publicPrefixes = ["/movie", "/bookings", "/profile"];
+
+  if (
+    pathname === "/" ||
+    publicPages.includes(pathname) ||
+    publicPrefixes.some((p) => pathname.startsWith(p))
+  ) {
     return NextResponse.next();
   }
 
