@@ -1,4 +1,3 @@
-"use client";
 import React, { Suspense } from "react";
 import "@/styles/movie-details.css";
 import AdminInner from "./adminInnerClient";
