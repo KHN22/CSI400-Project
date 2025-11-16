@@ -14,9 +14,9 @@ const changeProfiles = require('./routes/profiles');
 const app = express();
 
 // Configure CORS to allow the frontend (including Vercel previews) and support credentials
-// Default allowed client URL to the deployed frontend on Vercel. Set CLIENT_URL
-// in the Render environment to override if necessary.
-const allowedOrigins = [process.env.CLIENT_URL || 'https://csi400-project.vercel.app'];
+// Default allowed client URL to the deployed frontend on Vercel. Set FRONTEND_URL
+// in the Render/hosting environment to override if necessary.
+const allowedOrigins = [process.env.FRONTEND_URL || 'https://csi400-project.vercel.app'];
 const vercelPreviewRegex = /\.vercel\.app$/;
 
 app.use(cors({
