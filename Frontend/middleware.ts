@@ -23,7 +23,7 @@ export function middleware(req: NextRequest) {
 
   // public pages and prefixes that do not require auth
   const publicPages = ["/login", "/register", "/signup", "/auth/callback"];
-  const publicPrefixes = ["/movie", "/bookings", "/profile"];
+  const publicPrefixes = ["/movie", "/bookings", "/profile", "/admin"];
 
   if (
     pathname === "/" ||

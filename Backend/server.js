@@ -29,7 +29,8 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  // allow common headers used by the frontend (case-insensitive)
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'X-Requested-With', 'Accept', 'Origin']
 }));
 app.use(express.json());
 app.use(require('cookie-parser')());
