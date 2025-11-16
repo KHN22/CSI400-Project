@@ -30,7 +30,7 @@ export default function BookingInnerClient() {
 
         if (!res.ok) {
           if (res.status === 401) {
-            window.location.href = `/login?redirect=/booking/${id}?showtime=${showtime}`;
+            try { window.alert("Please Login first"); } catch(e){}
             return;
           }
           if (res.status === 404) throw new Error("Movie not found");
