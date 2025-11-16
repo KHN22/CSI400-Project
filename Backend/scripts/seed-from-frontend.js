@@ -12,7 +12,8 @@
  */
 const path = require("path");
 
-const BACKEND_BASE = process.env.BACKEND_BASE || "http://localhost:4000";
+// Default to the deployed backend on Render; override with BACKEND_BASE env if needed.
+const BACKEND_BASE = process.env.BACKEND_BASE || "https://csi400-project.onrender.com";
 const AUTH_COOKIE = process.env.AUTH_COOKIE || "";
 
 async function main() {

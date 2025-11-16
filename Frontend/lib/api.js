@@ -3,7 +3,9 @@ import { mockMovies, mockBookings, mockUser } from "./mock-data"
 // Simulated API delay
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+// Default to the deployed backend on Render. In Vercel set `NEXT_PUBLIC_BACKEND_URL`
+// to override at deploy-time. For local development, you can keep `.env.local`.
+export const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "https://csi400-project.onrender.com";
 
 export const moviesApi = {
   getAll: async () => {
