@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/buttons.css";
 import { BACKEND_BASE } from "@/lib/api";
@@ -22,6 +22,24 @@ export default function LoginInner() {
   });
   const [registerError, setRegisterError] = useState("");
   const [registerSuccess, setRegisterSuccess] = useState("");
+
+  // If the user is already authenticated (cookie set by backend), redirect away
+  useEffect(() => {
+    let mounted = true;
+    async function checkAuth() {
+      try {
+        const res = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: "include" });
+        if (!mounted) return;
+        if (res.ok) {
+          router.push(from);
+        }
+      } catch (e) {
+        // ignore network errors here
+      }
+    }
+    checkAuth();
+    return () => { mounted = false; };
+  }, [from, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
