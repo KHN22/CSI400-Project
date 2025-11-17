@@ -60,7 +60,7 @@ export function Navbar() {
   return (
     <nav className="cb-navbar">
       <div className="cb-navbar-left">
-        <Link href="/" className="cb-logo"><CIcon icon={cilMovie} />CineBook</Link>
+        <Link href="/" className="cb-logo">🎬 CineBook</Link>
       </div>
 
       <div className="cb-navbar-center">

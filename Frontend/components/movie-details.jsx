@@ -44,7 +44,7 @@ export default function MovieDetails({ movie, selectedShowtime }) {
 
           <div className="movie-meta">
             <div className="movie-price">
-              <span className="price-label">Ticket Price:</span>
+              <span className="price-label">🎫 Ticket Price :</span>
               <span className="price-value">
                 ฿{Number(movie.ticketPrice || 0).toLocaleString()}
               </span>
@@ -57,7 +57,7 @@ export default function MovieDetails({ movie, selectedShowtime }) {
 
           <div className="showtimes-card">
             <div className="showtimes-header">
-              <h2>Available Showtimes</h2>
+              <h2>📅 Select Showtimes</h2>
             </div>
 
             {(!movie.showtimes || movie.showtimes.length === 0) ? (
