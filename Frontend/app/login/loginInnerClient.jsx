@@ -124,7 +124,7 @@ export default function LoginInner() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: "#111827" }}>
+    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, backgroundColor: "#111827" }}>
       <h1 style={{ marginBottom: 16, fontSize: 24, fontWeight: 500, color: "#fff" }}>Login</h1>
       <form onSubmit={handleSubmit}>
         <label style={{ display: "block", marginBottom: 8, color: "#fff" }}>
@@ -133,7 +133,7 @@ export default function LoginInner() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 }}
+            style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: "#1f2937", color: "#fff"}}
             required
           />
         </label>
@@ -143,7 +143,7 @@ export default function LoginInner() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 }}
+            style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: "#1f2937", color: "#fff"}}
             required
           />
         </label>

@@ -10,7 +10,7 @@
   border-radius: 6px;
   background: #000; /* black fill by default */
   color: #cfe0ff;
-  border: 1px solid #6366f1; /* primary blue */
+  /* border: 1px solid #6366f1; */
   cursor: pointer;
   font-weight: 600;
   transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
