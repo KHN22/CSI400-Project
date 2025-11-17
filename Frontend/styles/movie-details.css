@@ -185,7 +185,7 @@
 .showtime-button.selected {
   background: #6366f1;
   color: #061021;
-  border-color: #6366f1;
+  /* border-color: #6366f1; */
 }
 
 .showtimes-card,
@@ -264,6 +264,7 @@
   color: #cfe0ff;
   border: 1px solid #6366f1; /* primary blue */
   cursor: pointer;
+  width: 200px;
   font-weight: 600;
   transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
   box-shadow: none;
