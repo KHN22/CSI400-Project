@@ -124,7 +124,7 @@ export default function LoginInner() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, backgroundColor: "#111827" }}>
+    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, backgroundColor: "#111827" , border: "1px solid #202135"}}>
       <h1 style={{ marginBottom: 16, fontSize: 24, fontWeight: 500, color: "#fff" }}>Login</h1>
       <form onSubmit={handleSubmit}>
         <label style={{ display: "block", marginBottom: 8, color: "#fff" }}>
