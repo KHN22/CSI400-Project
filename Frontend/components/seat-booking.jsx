@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import "../styles/seat-booking.css";
+import Modal from "@/components/ui/modal";
 
 const ROWS = ["A", "B", "C", "D", "E", "F"];
 const SEATS_PER_ROW = 8;
@@ -76,8 +77,8 @@ export default function SeatBooking(props) {
       });
 
       if (!check.ok) {
-        // not logged in -> show a popup and abort booking flow
-        try { window.alert("Please Login first"); } catch (e) {}
+        // not logged in -> show a modal and abort booking flow
+        setShowLoginModal(true);
         return;
       }
 
@@ -104,8 +105,14 @@ export default function SeatBooking(props) {
     }
   }
 
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   return (
     <div className="seat-booking">
+      <Modal open={showLoginModal} onClose={() => setShowLoginModal(false)} title="Please login first">
+        <p style={{ marginBottom: 24 }}>You must be signed in to book seats.</p>
+        <a href="/login" className="btn-primary" style={{ marginRight: 12 }}>Go to Login</a>
+      </Modal>
       {/* Header */}
       <div className="booking-header">
         <Link href={`/movie/${movie.id}`}>

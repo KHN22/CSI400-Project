@@ -1,24 +1,43 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle2, QrCode } from "lucide-react"
 import { bookingsApi } from "@/lib/api"
+import Modal from "@/components/ui/modal"
 import "../styles/payment.css"
 
 export function PaymentFlow({ bookingData }) {
+  const [user, setUser] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const router = useRouter()
+    useEffect(() => {
+      async function fetchUser() {
+        try {
+          const res = await fetch("/api/auth/me", { credentials: "include" });
+          if (res.ok) {
+            const payload = await res.json();
+            setUser(payload.user || payload || null);
+          } else {
+            setUser(null);
+          }
+        } catch {
+          setUser(null);
+        }
+      }
+      fetchUser();
+    }, []);
   const [isPaying, setIsPaying] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
 
   const handlePayment = async () => {
-    setIsPaying(true)
-
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    setIsPaying(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     try {
-      // Create booking record
       await bookingsApi.create({
         movieId: bookingData.movieId,
         movieTitle: bookingData.movieTitle,
@@ -26,16 +45,15 @@ export function PaymentFlow({ bookingData }) {
         showtime: bookingData.showtime,
         seats: bookingData.seats,
         total: bookingData.total,
-      })
-
-      setIsComplete(true)
+      });
+      setIsComplete(true);
     } catch (error) {
-      console.error("Payment failed:", error)
-      alert("Payment failed. Please try again.")
+      console.error("Payment failed:", error);
+      alert("Payment failed. Please try again.");
     } finally {
-      setIsPaying(false)
+      setIsPaying(false);
     }
-  }
+  };
 
   const handleFinish = () => {
     router.push("/bookings")
@@ -85,11 +103,14 @@ export function PaymentFlow({ bookingData }) {
 
   return (
     <div className="payment-container">
+      <Modal open={showLoginModal} onClose={() => setShowLoginModal(false)} title="Please login first">
+        <p style={{ marginBottom: 24 }}>You must be signed in to complete a booking or payment.</p>
+        <a href="/login" className="btn-primary" style={{ marginRight: 12 }}>Go to Login</a>
+      </Modal>
       <div className="payment-header">
         <h1>Complete Payment</h1>
         <p>Scan the QR code below to complete your payment via PromptPay</p>
       </div>
-
       <div className="payment-grid">
         {/* QR Code Section */}
         <div className="qr-card">
@@ -100,17 +121,14 @@ export function PaymentFlow({ bookingData }) {
               <p>(Mock Payment)</p>
             </div>
           </div>
-
           <div className="qr-amount">
             <p className="qr-amount-label">Amount to Pay</p>
             <p className="qr-amount-value">${bookingData.total.toFixed(2)}</p>
           </div>
         </div>
-
         {/* Booking Summary */}
         <div className="payment-summary-card">
           <h2>Booking Summary</h2>
-
           <div className="payment-details">
             <div className="payment-row">
               <span className="payment-label">Movie</span>

@@ -25,8 +25,10 @@ export default function StatementsPanel() {
     try {
       const opts = {};
       // SuperAdmin may request all branches; Manager/Staff limited to their branch
-      if (me && me.role !== 'SuperAdmin') {
-        if (me.branch) opts.branch = me.branch;
+      if (me && me.role !== 'SuperAdmin' && me.branch) {
+        opts.branch = me.branch;
+      } else if (me && me.role === 'SuperAdmin' && me.branch) {
+        opts.branch = me.branch; // allow SuperAdmin to filter by branch
       }
       const d = await adminApi.getStatements(opts);
       setStatements(d || null);

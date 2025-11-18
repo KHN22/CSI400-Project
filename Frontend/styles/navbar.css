@@ -113,3 +113,64 @@
     display: none;
   } /* small screens hide center links; you can add a burger menu later */
 }
+
+/* Account dropdown and menu */
+.cb-menu {
+  min-width: 160px;
+  background: #071026;
+  color: #e6eef8;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.cb-menu-item {
+  display: block;
+  padding: 8px 10px;
+  color: #dbeafe;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.cb-menu-item:hover {
+  background: rgba(255,255,255,0.02);
+  color: #fff;
+}
+
+.cb-menu-item.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* small role/branch badges */
+.cb-role, .cb-branch {
+  background: rgba(255,255,255,0.03);
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #d1e9ff;
+}
+
+/* Buttons used in the navbar */
+.btn-primary {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn-primary:hover { filter: brightness(0.95); }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.cb-user-meta { gap: 6px; }
+

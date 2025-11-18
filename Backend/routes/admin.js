@@ -126,7 +126,8 @@ router.patch('/users/:id/role', requireAdmin, async (req, res) => {
  *       200:
  *         description: Branch updated
  */
-router.patch('/users/:id/branch', requireAdmin, async (req, res) => {
+// PATCH /api/admin/users/:id/branch
+router.patch('/users/:id/branch', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { branch } = req.body;
@@ -135,9 +136,22 @@ router.patch('/users/:id/branch', requireAdmin, async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'user not found' });
 
-    user.branch = branch || null;
-    await user.save();
-    return res.json({ message: 'branch updated', user: { _id: user._id, email: user.email, username: user.username, role: user.role, branch: user.branch } });
+    // Only SuperAdmin can assign arbitrary branches
+    if (req.user.role === 'SuperAdmin') {
+      user.branch = branch || null;
+      await user.save();
+      return res.json({ message: 'branch updated', user: { _id: user._id, email: user.email, username: user.username, role: user.role, branch: user.branch } });
+    }
+    // Managers can only assign Staff to their own branch
+    if (req.user.role === 'Manager') {
+      if (user.role !== 'Staff') return res.status(403).json({ message: 'Managers can only assign branch to Staff'});
+      if (!req.user.branch) return res.status(403).json({ message: 'Manager has no branch'});
+      if (branch !== req.user.branch) return res.status(403).json({ message: 'Managers can only assign their own branch'});
+      user.branch = branch;
+      await user.save();
+      return res.json({ message: 'branch updated', user: { _id: user._id, email: user.email, username: user.username, role: user.role, branch: user.branch } });
+    }
+    return res.status(403).json({ message: 'Forbidden'});
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'server error' });

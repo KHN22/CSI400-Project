@@ -1,43 +1,7 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { adminApi, authApi } from "@/lib/api";
-
-export default function RequestsPanel() {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [me, setMe] = useState(null);
-
-  useEffect(() => { loadRequests(); }, []);
-
-  async function loadRequests() {
-    setLoading(true);
-    try {
-      const d = await adminApi.getRequests();
-      setRequests(d.requests || []);
-    } catch (err) {
-      console.warn('[RequestsPanel] loadRequests', err);
-      setRequests([]);
-    } finally { setLoading(false); }
-  }
-
-  async function loadMe() {
-    try {
-      const u = await authApi.getMe();
-      setMe(u);
-    } catch (e) { setMe(null); }
-  }
-
-  useEffect(() => { loadMe(); }, []);
-
-  async function updateRequestStatus(id, status) {
-    try {
-      await adminApi.patchRequest(id, { status });
-      await loadRequests();
-    } catch (err) {
-      console.error('[RequestsPanel] updateRequestStatus', err);
-      alert(err.message || 'Failed to update request');
-    }
-  }
+  // Filter requests for branch-scoped managers/staff
+  const filteredRequests = me && me.role !== 'SuperAdmin' && me.branch
+    ? requests.filter(r => r.payload?.branch === me.branch)
+    : requests;
 
   return (
     <section style={{ marginTop: 28 }}>
@@ -47,16 +11,16 @@ export default function RequestsPanel() {
       </div>
       {loading ? <div>Loading requests…</div> : (
         <div>
-          {requests.length === 0 ? <div style={{ color: '#888' }}>No requests</div> : (
+          {filteredRequests.length === 0 ? <div style={{ color: '#888' }}>No requests</div> : (
             <table className="table"><thead><tr><th>Type</th><th>By</th><th>Status</th><th>Action</th></tr></thead>
               <tbody>
-                {requests.map(req => (
+                {filteredRequests.map(req => (
                   <tr key={req._id}>
                     <td>{req.type}</td>
                     <td>{req.requesterId?.email}</td>
                     <td>{req.status}</td>
                     <td>
-                      {me && me.role === 'SuperAdmin' ? (
+                      {me && (me.role === 'SuperAdmin' || (me.role === 'Manager' && req.payload?.branch === me.branch)) ? (
                         <>
                           {req.status !== 'approved' && <button onClick={()=>updateRequestStatus(req._id, 'approved')} className="btn-outline-blue">Approve</button>}
                           {req.status !== 'rejected' && <button onClick={()=>updateRequestStatus(req._id, 'rejected')} style={{ marginLeft: 8 }} className="btn">Reject</button>}
@@ -74,4 +38,4 @@ export default function RequestsPanel() {
       )}
     </section>
   );
-}
+// ...existing code...

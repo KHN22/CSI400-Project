@@ -2,13 +2,20 @@ const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
 const requireAdmin = require('../middleware/requireAdmin');
+const requireBranchAdminOrManager = require('../middleware/requireBranchAdminOrManager');
 
 // GET /api/admin/statements?branch=A&from=2025-01-01&to=2025-12-31
-router.get('/', requireAdmin, async (req, res) => {
+// GET /api/admin/statements?branch=A&from=2025-01-01&to=2025-12-31
+router.get('/', requireBranchAdminOrManager, async (req, res) => {
   try {
     const { branch, from, to } = req.query;
     const filter = {};
-    if (branch) filter.branch = branch;
+    // SuperAdmin: can query any branch; Manager/Staff: only their branch
+    if (req.user.role !== 'SuperAdmin' && req.branchScope) {
+      filter.branch = req.branchScope;
+    } else if (branch) {
+      filter.branch = branch;
+    }
     if (from || to) filter.createdAt = {};
     if (from) filter.createdAt.$gte = new Date(from);
     if (to) filter.createdAt.$lte = new Date(to);

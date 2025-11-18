@@ -48,9 +48,9 @@ export default function UsersPanel() {
       setError('You are not authorized to change roles');
       return;
     }
-    // Managers can only assign roles lower than themselves
-    if (me.role === 'Manager' && role === 'SuperAdmin') {
-      setError('Managers cannot assign SuperAdmin');
+    // Managers can only assign Staff role, not Manager/SuperAdmin
+    if (me.role === 'Manager' && role !== 'Staff') {
+      setError('Managers can only assign Staff role');
       return;
     }
     try {
@@ -68,18 +68,19 @@ export default function UsersPanel() {
   }
 
   async function setBranch(userId, branch) {
-    // Only SuperAdmin can assign arbitrary branches.
     if (!me) { setError('Please login'); return; }
-    if (me.role !== 'SuperAdmin') {
-      // Managers can assign Staff to their own branch only
-      if (me.role === 'Manager') {
-        if (!me.branch) { setError('Manager has no branch'); return; }
-        // enforce branch equals manager's branch
-        if (branch && branch !== me.branch) { setError('Managers can only assign staff to their branch'); return; }
-      } else {
-        setError('You are not authorized to change branch');
-        return;
-      }
+    // Only SuperAdmin can assign arbitrary branches
+    if (me.role === 'SuperAdmin') {
+      // allow any branch
+    } else if (me.role === 'Manager') {
+      // Managers can only assign Staff to their own branch
+      const user = users.find(u => u._id === userId);
+      if (!user || user.role !== 'Staff') { setError('Managers can only assign branch to Staff'); return; }
+      if (!me.branch) { setError('Manager has no branch'); return; }
+      if (branch !== me.branch) { setError('Managers can only assign their own branch'); return; }
+    } else {
+      setError('You are not authorized to change branch');
+      return;
     }
     try {
       const res = await fetch(`${BACKEND_BASE}/api/admin/users/${userId}/branch`, {
@@ -94,36 +95,8 @@ export default function UsersPanel() {
       }
     } catch (e) { setError('Network error'); }
   }
-                <td>
-                  {(me && (me.role === 'SuperAdmin' || me.role === 'Manager')) ? (
-                    <select value={u.role} onChange={(e)=>setRole(u._id, e.target.value)}>
-                      <option value="Guest">Guest</option>
-                      <option value="Staff">Staff</option>
-                      <option value="Manager">Manager</option>
-                      <option value="SuperAdmin">SuperAdmin</option>
-                    </select>
-                  ) : (
-                    <span>{u.role}</span>
-                  )}
 
-                  {me && me.role === 'SuperAdmin' ? (
-                    <select value={u.branch || ''} onChange={(e)=>setBranch(u._id, e.target.value || null)} style={{ marginLeft: 8 }}>
-                      <option value="">No branch</option>
-                      <option value="A">A</option>
-                      <option value="B">B</option>
-                      <option value="C">C</option>
-                    </select>
-                  ) : me && me.role === 'Manager' ? (
-                    // Managers can only assign staff to their branch (simple UI)
-                    <select value={u.branch || ''} onChange={(e)=>setBranch(u._id, e.target.value || null)} style={{ marginLeft: 8 }}>
-                      <option value="">No branch</option>
-                      <option value={me.branch}>{me.branch}</option>
-                    </select>
-                  ) : (
-                    <span style={{ marginLeft: 8 }}>{u.branch || '-'}</span>
-                  )}
-                </td>
-            {users.map(u => (
+  return (
               <section style={{ marginTop: 16 }}>
                 <h2>Users</h2>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
@@ -157,8 +130,8 @@ export default function UsersPanel() {
                               <select value={u.role} onChange={(e)=>setRole(u._id, e.target.value)}>
                                 <option value="Guest">Guest</option>
                                 <option value="Staff">Staff</option>
-                                <option value="Manager">Manager</option>
-                                <option value="SuperAdmin">SuperAdmin</option>
+                                {me.role === 'SuperAdmin' && <option value="Manager">Manager</option>}
+                                {me.role === 'SuperAdmin' && <option value="SuperAdmin">SuperAdmin</option>}
                               </select>
                             ) : (
                               <span>{u.role}</span>
@@ -190,3 +163,6 @@ export default function UsersPanel() {
                   </table>
                 )}
               </section>
+  );
+}
+
