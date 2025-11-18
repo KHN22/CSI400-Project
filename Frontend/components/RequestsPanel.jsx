@@ -1,3 +1,39 @@
+import React, { useEffect, useState } from "react";
+import { adminApi, authApi } from "@/lib/api";
+
+export default function RequestsPanel() {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [me, setMe] = useState(null);
+
+  useEffect(() => { loadRequests(); }, []);
+  async function loadRequests() {
+    setLoading(true);
+    try {
+      const d = await adminApi.getRequests();
+      setRequests(d.requests || []);
+    } catch (err) {
+      setRequests([]);
+    } finally { setLoading(false); }
+  }
+
+  useEffect(() => { loadMe(); }, []);
+  async function loadMe() {
+    try {
+      const u = await authApi.getMe();
+      setMe(u);
+    } catch (e) { setMe(null); }
+  }
+
+  async function updateRequestStatus(id, status) {
+    try {
+      await adminApi.patchRequest(id, { status });
+      await loadRequests();
+    } catch (err) {
+      alert(err.message || 'Failed to update request');
+    }
+  }
+
   // Filter requests for branch-scoped managers/staff
   const filteredRequests = me && me.role !== 'SuperAdmin' && me.branch
     ? requests.filter(r => r.payload?.branch === me.branch)
@@ -38,3 +74,4 @@
       )}
     </section>
   );
+}
