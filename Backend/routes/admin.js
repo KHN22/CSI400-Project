@@ -13,6 +13,24 @@ function requireAdmin(req, res, next) {
   return res.status(403).json({ message: 'forbidden' });
 }
 
+/**
+ * @openapi
+ * /api/admin/users:
+ *   get:
+ *     tags:
+ *       - admin
+ *     summary: Search users (admin only)
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: List of users
+ */
 // GET /api/admin/users?q=search
 router.get('/users', requireAdmin, async (req, res) => {
   try {
@@ -30,6 +48,35 @@ router.get('/users', requireAdmin, async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/admin/users/{id}/role:
+ *   patch:
+ *     tags:
+ *       - admin
+ *     summary: Update a user's role (admin only)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [Guest, Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Role updated
+ */
 // PATCH /api/admin/users/:id/role  { role: "Guest"|"Admin" }
 router.patch('/users/:id/role', requireAdmin, async (req, res) => {
   try {

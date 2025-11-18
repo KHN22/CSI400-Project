@@ -5,6 +5,28 @@ const fs = require('fs');
 
 const router = express.Router();
 
+/**
+ * @openapi
+ * /api/uploads:
+ *   post:
+ *     tags:
+ *       - uploads
+ *     summary: Upload a file (multipart/form-data)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Uploaded file info
+ */
+
 const uploadDir = path.join(__dirname, '..', 'public', 'uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
 

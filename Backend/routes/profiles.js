@@ -25,6 +25,29 @@ const upload = multer({
 
 router.use(verifyToken);
 
+/**
+ * @openapi
+ * /api/auth/avatar:
+ *   post:
+ *     tags:
+ *       - profiles
+ *     summary: Upload/update user's avatar (requires auth)
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Returns updated user
+ */
 router.post('/', upload.single('avatar'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });

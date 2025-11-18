@@ -41,6 +41,38 @@ const options = {
         ErrorResponse: {
           type: 'object',
           properties: { error: { type: 'string' } }
+        },
+        Movie: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            runtime: { type: 'number' },
+            rating: { type: 'string' },
+            genre: { type: 'string' },
+            poster: { type: 'string' }
+          }
+        },
+        Booking: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            userId: { type: 'string' },
+            movieId: { type: 'string' },
+            showtime: { type: 'string' },
+            seats: { type: 'array', items: { type: 'string' } },
+            status: { type: 'string' }
+          }
+        },
+        UserSummary: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            email: { type: 'string' },
+            username: { type: 'string' },
+            role: { type: 'string' }
+          }
         }
       }
     }

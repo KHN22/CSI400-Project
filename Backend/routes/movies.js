@@ -8,6 +8,26 @@ const requireAdmin = require('../middleware/requireAdmin');
 
 const router = express.Router();
 
+/**
+ * @openapi
+ * /api/movies:
+ *   get:
+ *     tags:
+ *       - movies
+ *     summary: List all movies
+ *     responses:
+ *       200:
+ *         description: A list of movies
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 movies:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Movie'
+ */
 // Public routes (ไม่ต้อง login)
 router.get('/', async (req, res) => {
   try {
@@ -18,6 +38,29 @@ router.get('/', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/movies/{id}:
+ *   get:
+ *     tags:
+ *       - movies
+ *     summary: Get movie by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Movie object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Movie'
+ *       404:
+ *         description: Movie not found
+ */
 router.get('/:id', async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
@@ -32,6 +75,23 @@ router.get('/:id', async (req, res) => {
 router.use(verifyToken);
 router.use(requireAdmin);
 
+/**
+ * @openapi
+ * /api/movies:
+ *   post:
+ *     tags:
+ *       - movies
+ *     summary: Create a new movie (admin only)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Movie'
+ *     responses:
+ *       201:
+ *         description: Movie created
+ */
 // Admin routes
 router.post('/', async (req, res) => {
   try {
@@ -45,6 +105,29 @@ router.post('/', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/movies/{id}:
+ *   patch:
+ *     tags:
+ *       - movies
+ *     summary: Update a movie (admin only)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Movie'
+ *     responses:
+ *       200:
+ *         description: Movie updated
+ */
 router.patch('/:id', async (req, res) => {
   try {
     console.log('[Movies] Updating movie:', req.params.id, req.body);
@@ -61,6 +144,23 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/movies/{id}:
+ *   delete:
+ *     tags:
+ *       - movies
+ *     summary: Delete a movie (admin only)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Movie deleted
+ */
 router.delete('/:id', async (req, res) => {
   try {
     const movie = await Movie.findByIdAndDelete(req.params.id);

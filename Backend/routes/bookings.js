@@ -5,6 +5,36 @@ const verifyToken = require('../middleware/verifyToken');
 
 
 // <-- public route stays public
+/**
+ * @openapi
+ * /api/bookings/movie/{movieId}:
+ *   get:
+ *     tags:
+ *       - bookings
+ *     summary: Get booked seats for a movie (optionally filter by showtime)
+ *     parameters:
+ *       - in: path
+ *         name: movieId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: showtime
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of booked seats
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 seats:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ */
 router.get('/movie/:movieId', async (req, res) => {
   try {
     const { movieId } = req.params;
@@ -24,6 +54,19 @@ router.get('/movie/:movieId', async (req, res) => {
 router.use(verifyToken);
 
 // GET /api/bookings  -> bookings for current user
+/**
+ * @openapi
+ * /api/bookings:
+ *   get:
+ *     tags:
+ *       - bookings
+ *     summary: Get bookings for current user (requires auth)
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User bookings
+ */
 router.get('/', async (req, res) => {
   try {
     // require authenticated user
@@ -41,6 +84,34 @@ router.get('/', async (req, res) => {
 
 // POST /api/bookings  -> create booking (body: { movieId, title, seats, showtime })
 // keep verifyToken for safety (already applied globally)
+/**
+ * @openapi
+ * /api/bookings:
+ *   post:
+ *     tags:
+ *       - bookings
+ *     summary: Create a booking (requires auth)
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               movieId:
+ *                 type: string
+ *               showtime:
+ *                 type: string
+ *               seats:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: Booking created
+ */
 router.post('/', async (req, res) => {
   try {
     console.log('[Bookings] User from token:', req.user);
@@ -72,6 +143,19 @@ router.post('/', async (req, res) => {
 });
 
 // (Optional) admin: GET /api/bookings/all
+/**
+ * @openapi
+ * /api/bookings/all:
+ *   get:
+ *     tags:
+ *       - bookings
+ *     summary: Get all bookings (admin only)
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: All bookings
+ */
 router.get('/all', async (req, res) => {
   try {
     if (req.user.role !== 'Admin') return res.status(403).json({ message: 'forbidden' });
@@ -84,6 +168,25 @@ router.get('/all', async (req, res) => {
 });
 
 // Add single booking fetch (owner or admin)
+/**
+ * @openapi
+ * /api/bookings/{id}:
+ *   get:
+ *     tags:
+ *       - bookings
+ *     summary: Get a single booking by id (owner or admin)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Booking object
+ */
 router.get('/:id', async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id).populate('movieId');
