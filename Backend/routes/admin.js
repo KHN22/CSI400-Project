@@ -144,4 +144,16 @@ router.patch('/users/:id/branch', requireAdmin, async (req, res) => {
   }
 });
 
+// mount additional admin sub-routers (auditlogs, requests, statements)
+try {
+  const auditlogsRouter = require('./auditlogs');
+  const requestsRouter = require('./requests');
+  const statementsRouter = require('./statements');
+  router.use('/auditlogs', auditlogsRouter);
+  router.use('/requests', requestsRouter);
+  router.use('/statements', statementsRouter);
+} catch (e) {
+  console.error('Failed to mount admin sub-routers:', e.message);
+}
+
 module.exports = router;

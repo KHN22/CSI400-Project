@@ -68,3 +68,55 @@ export const userApi = {
     return mockUser
   },
 }
+
+// Admin & misc API helpers (calls backend endpoints with credentials)
+export const adminApi = {
+  getAuditLogs: async (opts = {}) => {
+    const qs = new URLSearchParams(opts).toString();
+    const res = await fetch(`${BACKEND_BASE}/api/admin/auditlogs?${qs}`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch audit logs');
+    return res.json();
+  },
+
+  getRequests: async () => {
+    const res = await fetch(`${BACKEND_BASE}/api/admin/requests`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch requests');
+    return res.json();
+  },
+
+  postRequest: async (body) => {
+    const res = await fetch(`${BACKEND_BASE}/api/admin/requests`, { credentials: 'include', method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`postRequest failed ${res.status}: ${t}`);
+    }
+    return res.json();
+  },
+
+  getStatements: async (opts = {}) => {
+    const qs = new URLSearchParams(opts).toString();
+    const res = await fetch(`${BACKEND_BASE}/api/admin/statements?${qs}`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch statements');
+    return res.json();
+  }
+}
+
+// Auth helper for frontend components to fetch current user from backend
+export const authApi = {
+  getMe: async () => {
+    const res = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: 'include' });
+    if (!res.ok) return null;
+    const payload = await res.json().catch(() => null);
+    return payload?.user || payload || null;
+  }
+}
+
+// Admin request helpers
+adminApi.patchRequest = async (id, body) => {
+  const res = await fetch(`${BACKEND_BASE}/api/admin/requests/${id}`, { credentials: 'include', method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`patchRequest failed ${res.status}: ${t}`);
+  }
+  return res.json();
+};

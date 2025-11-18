@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
+const AuditLog = require('../models/AuditLog');
 const verifyToken = require('../middleware/verifyToken');
 
 
@@ -134,6 +135,20 @@ router.post('/', async (req, res) => {
 
     console.log('[Bookings] Creating booking:', booking);
     await booking.save();
+
+    // create audit log for booking (BUY)
+    try {
+      await AuditLog.create({
+        actorId: uid,
+        action: 'BUY',
+        movieId: booking.movieId,
+        bookingId: booking._id,
+        branch: req.user?.branch || null,
+        details: { seats: booking.seats, totalPrice: booking.totalPrice }
+      });
+    } catch (alErr) {
+      console.error('[Bookings] Failed to create audit log:', alErr);
+    }
 
     res.status(201).json({ booking });
   } catch (err) {
