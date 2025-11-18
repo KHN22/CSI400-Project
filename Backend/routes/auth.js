@@ -8,6 +8,47 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 const COOKIE_NAME = 'token';
 
+/**
+ * @openapi
+ * /api/auth/register:
+ *   post:
+ *     tags:
+ *       - auth
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Missing fields
+ *       409:
+ *         description: User already exists
+ *       500:
+ *         description: Server error
+ */
 // register
 router.post('/register', async (req, res) => {
   try {
@@ -32,6 +73,45 @@ router.post('/register', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     tags:
+ *       - auth
+ *     summary: Login and receive an auth cookie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful (cookie set)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Missing fields
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
+ */
 // login
 router.post('/login', async (req, res) => {
   try {
@@ -63,6 +143,24 @@ router.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     tags:
+ *       - auth
+ *     summary: Logout by clearing the auth cookie
+ *     responses:
+ *       200:
+ *         description: Logged out
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 // logout
 router.post('/logout', (req, res) => {
   // clear cookie using same options used when setting it
@@ -70,6 +168,28 @@ router.post('/logout', (req, res) => {
   return res.json({ message: 'logged out' });
 });
 
+/**
+ * @openapi
+ * /api/auth/check:
+ *   get:
+ *     tags:
+ *       - auth
+ *     summary: Check authentication (returns user from token)
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Authenticated - returns user info from token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Unauthorized / invalid token
+ */
 // ตรวจสอบสถานะการล็อกอิน (frontend เรียก /api/auth/check)
 router.get('/check', verifyToken, (req, res) => {
   // verifyToken จะใส่ req.user ให้ถ้าตรวจสอบผ่าน
@@ -87,6 +207,30 @@ router.get('/check', verifyToken, (req, res) => {
 //   res.json({ user: req.user });
 // });
 
+/**
+ * @openapi
+ * /api/auth/me:
+ *   get:
+ *     tags:
+ *       - auth
+ *     summary: Get detailed current user info
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Returns current user info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
 router.get('/me', verifyToken, async (req, res) => {
   try {
     // req.user._id was set by verifyToken
