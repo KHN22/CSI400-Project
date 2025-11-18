@@ -63,7 +63,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: "#111827"}}>
+    <div className="bg-white]" style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: "#111827"}}>
       <h1 style={{ marginBottom: 16, fontSize: 24, fontWeight: 500, color: "#fff" }}>Register</h1>
       {USE_MOCK && (
         <div style={{ marginBottom: 12, color: "#FBBF24", fontSize: 13 }}>

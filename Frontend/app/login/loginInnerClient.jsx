@@ -124,7 +124,7 @@ export default function LoginInner() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, backgroundColor: "#111827" , border: "2px solid #2a2a3e"}}>
+    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, backgroundColor: "#111827" , border: "2px solid #2a2a3e" , borderRadius: 8}}>
       <h1 style={{ marginBottom: 16, fontSize: 24, fontWeight: 500, color: "#fff" }}>Login</h1>
       <form onSubmit={handleSubmit}>
         <label style={{ display: "block", marginBottom: 8, color: "#fff" }}>
@@ -167,17 +167,18 @@ export default function LoginInner() {
 
       {registerSuccess && <div style={{ color: "#34d399", marginTop: 8 }}>{registerSuccess}</div>}
       {showRegister && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ backgroundColor: "#0f172a", padding: 24, borderRadius: 8, width: "90%", maxWidth: 420 }}>
-            <h2 style={{ marginBottom: 16, color: "#fff" }}>Register</h2>
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000}}>
+          <div style={{ backgroundColor: "#0f172a", padding: 24, borderRadius: 8, width: "90%", maxWidth: 420,border: "2px solid #2a2a3e" }}>
+            <h1 style={{ marginBottom: 16, color: "#fff", fontSize: 24, fontWeight: 500, fontStyle: "bold" }}>Register</h1>
             <form onSubmit={handleRegister}>
               <label style={{ display: "block", marginBottom: 8, color: "#fff" }}>
                 Username
                 <input
+                  className="active:bg-white-500"
                   type="text"
                   value={registerData.username}
                   onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
-                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 }}
+                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4,backgroundColor: "#1f2937", color: "#fff", }}
                 />
               </label>
               <label style={{ display: "block", marginBottom: 8, color: "#fff" }}>
@@ -186,7 +187,7 @@ export default function LoginInner() {
                   type="email"
                   value={registerData.email}
                   onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 }}
+                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 ,backgroundColor: "#1f2937", color: "#fff"}}
                   required
                 />
               </label>
@@ -196,7 +197,7 @@ export default function LoginInner() {
                   type="password"
                   value={registerData.password}
                   onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 }}
+                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 ,backgroundColor: "#1f2937", color: "#fff"}}
                   required
                 />
               </label>
@@ -206,13 +207,13 @@ export default function LoginInner() {
                   type="password"
                   value={registerData.confirmPassword}
                   onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 }}
+                  style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4,backgroundColor: "#1f2937", color: "#fff" }}
                   required
                 />
               </label>
               {registerError && <div style={{ color: "#f87171", marginBottom: 12 }}>{registerError}</div>}
               <div style={{ display: "flex", gap: 8 }}>
-                <button type="submit" style={{ flex: 1, padding: 10, background: "#10B981", color: "#fff", border: "none", borderRadius: 6 }}>Register</button>
+                <button type="submit" className="btn-outline-blue" style={{ flex: 1 }}>Register</button>
                 <button type="button" onClick={() => setShowRegister(false)} style={{ flex: 1, padding: 10, background: "#6B7280", color: "#fff", border: "none", borderRadius: 6 }}>Cancel</button>
               </div>
             </form>
