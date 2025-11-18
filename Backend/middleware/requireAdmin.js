@@ -5,7 +5,9 @@ const requireAdmin = (req, res, next) => {
   }
 
   // ตรวจสอบ role ว่าเป็น admin (case insensitive)
-  if (req.user.role?.toLowerCase() !== 'admin') {
+  // allow SuperAdmin role (preserve compatibility with older 'Admin' if present)
+  const r = (req.user.role || '').toLowerCase();
+  if (r !== 'superadmin' && r !== 'admin') {
     console.log('[requireAdmin] Access denied for user:', req.user);
     return res.status(403).json({ message: 'Admin access required' });
   }

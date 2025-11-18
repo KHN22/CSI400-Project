@@ -10,6 +10,7 @@ const adminRoutes = require('./routes/admin');
 const bookingsRoutes = require('./routes/bookings'); // new
 const uploadsRoutes = require('./routes/uploads'); // added
 const changeProfiles = require('./routes/profiles');
+const AuditLog = require('./models/AuditLog');
 const { swaggerUi, swaggerSpec } = require('./swagger');
 
 const app = express();

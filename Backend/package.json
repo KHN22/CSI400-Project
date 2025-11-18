@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
+    ,"migrate:add-branches": "node ./scripts/migrate-add-branches.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",

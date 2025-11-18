@@ -27,6 +27,8 @@ const bookingSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  // branch where booking was made (copied from movie or user token)
+  branch: { type: String, enum: ['A', 'B', 'C'], default: null },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'cancelled'],

@@ -124,8 +124,8 @@ router.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.passwordHash);
     if (!match) return res.status(401).json({ message: 'invalid credentials' });
 
-    // include role in token payload
-    const token = jwt.sign({ sub: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    // include role and branch in token payload
+    const token = jwt.sign({ sub: user._id, email: user.email, role: user.role, branch: user.branch || null }, JWT_SECRET, { expiresIn: '7d' });
 
     // set httpOnly cookie for browser sessions; for cross-site cookies we need SameSite=None and Secure in production
     res.cookie(COOKIE_NAME, token, {

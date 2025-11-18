@@ -16,12 +16,13 @@ export function MovieGrid() {
       setLoading(true);
       setErr("");
       try {
-        // เพิ่ม credentials และ headers
-        const res = await fetch(`${BACKEND_BASE}/api/movies`, {
+        // Fetch movies for selected branch (from localStorage). Default branch A.
+        const selectedBranch = (() => { try { return localStorage.getItem('selectedBranch') || 'A' } catch(e){ return 'A' } })();
+        const url = new URL(`${BACKEND_BASE}/api/movies`);
+        if (selectedBranch) url.searchParams.set('branch', selectedBranch);
+        const res = await fetch(url.toString(), {
           credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-          }
+          headers: { 'Accept': 'application/json' }
         });
         
         console.log("[MovieGrid] fetch response:", {
@@ -49,6 +50,9 @@ export function MovieGrid() {
         if (mounted) setLoading(false);
       }
     }
+    // reload when branch changes
+    function onBranchChange(e) { load(); }
+    window.addEventListener('branch-changed', onBranchChange);
     load();
     return () => { mounted = false; }
   }, []);

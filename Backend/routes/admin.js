@@ -8,8 +8,9 @@ const router = express.Router();
 router.use(verifyToken);
 
 // helper: only admins allowed
+// helper: only SuperAdmin allowed for these endpoints
 function requireAdmin(req, res, next) {
-  if (req.user && req.user.role === 'Admin') return next();
+  if (req.user && req.user.role === 'SuperAdmin') return next();
   return res.status(403).json({ message: 'forbidden' });
 }
 
@@ -43,6 +44,7 @@ router.get('/users', requireAdmin, async (req, res) => {
     const users = await User.find(filter).select('_id email username role createdAt updatedAt').sort({ createdAt: -1 });
     return res.json({ users });
   } catch (err) {
+ *                 enum: [Guest, Staff, Manager, SuperAdmin]
     console.error(err);
     return res.status(500).json({ message: 'server error' });
   }
@@ -54,7 +56,8 @@ router.get('/users', requireAdmin, async (req, res) => {
  *   patch:
  *     tags:
  *       - admin
- *     summary: Update a user's role (admin only)
+    const allowed = ['Guest', 'Staff', 'Manager', 'SuperAdmin'];
+    if (!allowed.includes(role)) return res.status(400).json({ message: 'invalid role' });
  *     parameters:
  *       - in: path
  *         name: id
@@ -70,6 +73,23 @@ router.get('/users', requireAdmin, async (req, res) => {
  *             properties:
  *               role:
  *                 type: string
+router.patch('/users/:id/branch', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { branch } = req.body;
+    if (branch && !['A','B','C'].includes(branch)) return res.status(400).json({ message: 'invalid branch' });
+
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: 'user not found' });
+
+    user.branch = branch || null;
+    await user.save();
+    return res.json({ message: 'branch updated', user: { _id: user._id, email: user.email, username: user.username, role: user.role, branch: user.branch } });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'server error' });
+  }
+});
  *                 enum: [Guest, Admin]
  *     security:
  *       - cookieAuth: []
