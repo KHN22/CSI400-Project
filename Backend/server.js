@@ -10,6 +10,7 @@ const adminRoutes = require('./routes/admin');
 const bookingsRoutes = require('./routes/bookings'); // new
 const uploadsRoutes = require('./routes/uploads'); // added
 const changeProfiles = require('./routes/profiles');
+const { swaggerUi, swaggerSpec } = require('./swagger');
 
 const app = express();
 
@@ -34,6 +35,37 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(require('cookie-parser')());
+
+// Swagger UI: allow enabling on deployed environments by setting SWAGGER_ENABLE=true
+// If SWAGGER_USER and SWAGGER_PASS are set, require Basic auth to view docs.
+const enableSwagger = process.env.SWAGGER_ENABLE === 'true' || process.env.NODE_ENV !== 'production';
+if (enableSwagger) {
+  // optional basic auth protection using SWAGGER_USER / SWAGGER_PASS
+  const swaggerUser = process.env.SWAGGER_USER;
+  const swaggerPass = process.env.SWAGGER_PASS;
+
+  const swaggerAuth = (req, res, next) => {
+    if (!swaggerUser || !swaggerPass) return next(); // no auth configured
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Basic ')) {
+      res.set('WWW-Authenticate', 'Basic realm="Swagger"');
+      return res.status(401).send('Authentication required');
+    }
+    const base64 = auth.split(' ')[1] || '';
+    let decoded = '';
+    try { decoded = Buffer.from(base64, 'base64').toString('utf8'); } catch(e) { }
+    const [u, p] = decoded.split(':');
+    if (u === swaggerUser && p === swaggerPass) return next();
+    res.set('WWW-Authenticate', 'Basic realm="Swagger"');
+    return res.status(401).send('Invalid credentials');
+  };
+
+  app.use('/api-docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.get('/openapi.json', swaggerAuth, (req, res) => {
+    res.json(swaggerSpec);
+  });
+  console.log('Swagger UI available at /api-docs');
+}
 
 // serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
