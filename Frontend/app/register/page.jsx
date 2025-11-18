@@ -63,7 +63,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: rgb(17, 24, 39) }}>
+    <div style={{ maxWidth: 420, margin: "40px auto", padding: 24, border: "1px solid #e6e6e6", borderRadius: 8, backgroundColor: "#111827"}}>
       <h1 style={{ marginBottom: 16, fontSize: 24, fontWeight: 500, color: "#fff" }}>Register</h1>
       {USE_MOCK && (
         <div style={{ marginBottom: 12, color: "#FBBF24", fontSize: 13 }}>
@@ -73,19 +73,19 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit}>
         <label style={{ display: "block", marginBottom: 8, color: "#fff" }}>
           Username
-          <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: rgb(31 ,41 ,55)}} required />
+          <input type="text" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: "#1f2937", color: "#fff"}} required />
         </label>
         <label style={{ display: "block", marginBottom: 8, color: "#fff" }}>
           Email
-          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: rgb(31 ,41 ,55)}} required />
+          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: "#1f2937", color: "#fff"}} required />
         </label>
         <label style={{ display: "block", marginBottom: 12, color: "#fff" }}>
           Password
-          <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: rgb(31 ,41 ,55)}} required />
+          <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: "#1f2937", color: "#fff"}} required />
         </label>
         <label style={{ display: "block", marginBottom: 12, color: "#fff" }}>
           Confirm Password
-          <input type="password" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: rgb(31 ,41 ,55)}} required />
+          <input type="password" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} style={{ display: "block", width: "100%", padding: 8, marginTop: 6, boxSizing: "border-box", borderRadius: 4 , backgroundColor: "#1f2937", color: "#fff"}} required />
         </label>
         {error && <div style={{ color: "#f87171", marginBottom: 12 }}>{error}</div>}
         <div style={{ display: "flex", gap: 8 }}>
