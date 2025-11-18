@@ -1,5 +1,6 @@
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const path = require('path');
 
 const options = {
   definition: {
@@ -44,9 +45,17 @@ const options = {
       }
     }
   },
-  apis: ['./routes/*.js', './models/*.js']
+  // Use absolute paths so swagger-jsdoc reliably finds route files regardless of CWD
+  apis: [path.join(__dirname, 'routes', '*.js'), path.join(__dirname, 'models', '*.js')]
 };
 
 const swaggerSpec = swaggerJsDoc(options);
+
+// helpful debug: when module is loaded, print how many paths were discovered (will show 0 if none)
+try {
+  // do not throw if swaggerSpec.paths is undefined
+  const count = Object.keys(swaggerSpec.paths || {}).length;
+  console.log(`[swagger] generated spec, paths count: ${count}`);
+} catch (e) {}
 
 module.exports = { swaggerUi, swaggerSpec };
