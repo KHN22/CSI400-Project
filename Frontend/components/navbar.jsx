@@ -80,8 +80,32 @@ export function Navbar() {
 
       <div className="cb-navbar-center">
         <Link href="/" className="cb-link">Home</Link>
-        <Link href="/bookings" className="cb-link">Bookings</Link>
-        <Link href="/profile" className="cb-link">Profile</Link>
+        {user && (
+          <div className="cb-dropdown" onMouseEnter={() => setMenuOpen('bookings')} onMouseLeave={() => setMenuOpen(null)}>
+            <button className="cb-link" type="button">Bookings ▼</button>
+            {menuOpen === 'bookings' && (
+              <div className="cb-dropdown-menu">
+                <Link href="/bookings" className="cb-dropdown-item">Booking History</Link>
+                <Link href="/bookings/review" className="cb-dropdown-item">Review</Link>
+                <Link href="/bookings/refund" className="cb-dropdown-item">Refund</Link>
+              </div>
+            )}
+          </div>
+        )}
+        {user && (
+          <div className="cb-dropdown" onMouseEnter={() => setMenuOpen('profile')} onMouseLeave={() => setMenuOpen(null)}>
+            <button className="cb-link" type="button">Profile ▼</button>
+            {menuOpen === 'profile' && (
+              <div className="cb-dropdown-menu">
+                <Link href="/profile" className="cb-dropdown-item">Profile Home</Link>
+                <Link href="/profile/movies" className="cb-dropdown-item">Movies Panel</Link>
+                <Link href="/profile/requests" className="cb-dropdown-item">Requests Panel</Link>
+                <Link href="/profile/statements" className="cb-dropdown-item">Statements Panel</Link>
+                <Link href="/profile/users" className="cb-dropdown-item">Users Panel</Link>
+              </div>
+            )}
+          </div>
+        )}
         {canViewAdmin && (
           <Link href="/admin" className="cb-link" title={adminTitle}>
             Admin

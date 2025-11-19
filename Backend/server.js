@@ -11,6 +11,7 @@ const bookingsRoutes = require('./routes/bookings'); // new
 const uploadsRoutes = require('./routes/uploads'); // added
 const changeProfiles = require('./routes/profiles');
 const AuditLog = require('./models/AuditLog');
+const reviewsRoutes = require('./routes/reviews');
 const { swaggerUi, swaggerSpec } = require('./swagger');
 
 const app = express();
@@ -78,6 +79,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/uploads', uploadsRoutes); // new
 app.use('/api/auth/avatar', changeProfiles);
+app.use('/api/reviews', reviewsRoutes);
 
 const PORT = process.env.PORT || 4000;
 
