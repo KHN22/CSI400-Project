@@ -9,6 +9,7 @@ const movieSchema = new mongoose.Schema({
   showtimes: { type: [String], default: [] },
   // branch this movie belongs to (A/B/C). default to 'A'
   branch: { type: String, enum: ['A', 'B', 'C'], default: 'A' },
+  tmdbId: { type: String, default: null },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   ticketPrice: {
     type: Number,

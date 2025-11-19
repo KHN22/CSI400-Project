@@ -15,6 +15,7 @@ export default function MoviesPanel() {
   const [mError, setMError] = useState("");
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ title: "", year: "", description: "", poster: "", ticketPrice: "", showtimes: [], length: "", branch: null });
+  const [tmdbInput, setTmdbInput] = useState('');
   const [posterFile, setPosterFile] = useState(null);
   const [posterPreview, setPosterPreview] = useState("");
   const [me, setMe] = useState(null);
@@ -51,7 +52,7 @@ export default function MoviesPanel() {
 
   function startEdit(m) {
     setEditing(m._id);
-    setForm({ title: m.title || "", year: m.year || "", description: m.description || "", poster: m.poster || "", ticketPrice: m.ticketPrice || "", length: m.length || "", showtimes: Array.isArray(m.showtimes) ? m.showtimes : [], branch: m.branch || null });
+    setForm({ title: m.title || "", year: m.year || "", description: m.description || "", poster: m.poster || "", ticketPrice: m.ticketPrice || "", length: m.length || "", showtimes: Array.isArray(m.showtimes) ? m.showtimes : [], branch: m.branch || null, tmdbId: m.tmdbId || null });
     setPosterFile(null); setPosterPreview(m.poster || ""); if (fileRef.current) fileRef.current.value = "";
     if (m.showtimes && m.showtimes.length > 0) {
       setFirstShowTime(m.showtimes[0]);
@@ -61,7 +62,7 @@ export default function MoviesPanel() {
 
   function cancelCreate() {
     setEditing(null);
-    setForm({ title: "", year: "", description: "", poster: "", ticketPrice: "", showtimes: [], length: "", branch: null });
+    setForm({ title: "", year: "", description: "", poster: "", ticketPrice: "", showtimes: [], length: "", branch: null, tmdbId: null });
     setPosterFile(null); setPosterPreview(""); if (fileRef.current) fileRef.current.value = "";
     setFirstShowTime('10:00'); setNumShows(3);
   }
@@ -95,7 +96,7 @@ export default function MoviesPanel() {
       if (!form.ticketPrice) throw new Error('Ticket price is required');
       let posterUrl = form.poster || "";
       if (posterFile) posterUrl = await uploadPoster(posterFile);
-      const payload = { title: form.title, year: form.year ? Number(form.year) : undefined, description: form.description, poster: posterUrl, ticketPrice: Number(form.ticketPrice), showtimes: form.showtimes, length: form.length ? Number(form.length) : undefined };
+      const payload = { title: form.title, year: form.year ? Number(form.year) : undefined, description: form.description, poster: posterUrl, ticketPrice: Number(form.ticketPrice), showtimes: form.showtimes, length: form.length ? Number(form.length) : undefined, tmdbId: form.tmdbId || undefined };
       // SuperAdmin can set branch explicitly
       if (me && me.role === 'SuperAdmin' && form.branch) payload.branch = form.branch;
 
@@ -158,6 +159,33 @@ export default function MoviesPanel() {
                 <input placeholder="Title" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} required />
                 <input placeholder="Genres" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} required />
                 <input placeholder="Length (mins)" value={form.length} onChange={(e)=>setForm({...form, length:e.target.value})} type="number" required />
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input placeholder="TMDB URL or ID" value={tmdbInput} onChange={(e)=>setTmdbInput(e.target.value)} style={{ flex: 1 }} />
+                  <button type="button" className="btn-outline-blue" onClick={async () => {
+                    if (!tmdbInput) return alert('Enter TMDB URL or ID');
+                    try {
+                      const q = encodeURIComponent(tmdbInput);
+                      const res = await fetch(`${BACKEND_BASE}/api/movies/tmdb?url=${q}`, { credentials: 'include' });
+                      if (res.status === 400) {
+                        // try as id
+                        const idRes = await fetch(`${BACKEND_BASE}/api/movies/tmdb?tmdbId=${encodeURIComponent(tmdbInput)}`, { credentials: 'include' });
+                        if (!idRes.ok) throw new Error('TMDB lookup failed');
+                        const d = await idRes.json();
+                        const m = d.movie || d;
+                        setForm(prev => ({ ...prev, title: m.title || prev.title, poster: m.poster || prev.poster, year: m.year || prev.year, length: m.length || prev.length, description: m.description || prev.description, tmdbId: m.tmdbId || prev.tmdbId }));
+                        if (m.poster) setPosterPreview(m.poster);
+                        return;
+                      }
+                      if (!res.ok) throw new Error('TMDB lookup failed');
+                      const d = await res.json();
+                      const m = d.movie || d;
+                      setForm(prev => ({ ...prev, title: m.title || prev.title, poster: m.poster || prev.poster, year: m.year || prev.year, length: m.length || prev.length, description: m.description || prev.description, tmdbId: m.tmdbId || prev.tmdbId }));
+                      if (m.poster) setPosterPreview(m.poster);
+                    } catch (e) {
+                      alert('Failed to fetch from TMDB: ' + (e.message || e));
+                    }
+                  }}>Fetch</button>
+                </div>
                 <input placeholder="Year" value={form.year} onChange={(e)=>setForm({...form, year:e.target.value})} type="number" required />
 
                 <div>
