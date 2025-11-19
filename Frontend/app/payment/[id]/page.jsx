@@ -57,12 +57,6 @@ export default function PaymentPage() {
           return;
         }
 
-        const res = await fetch(`${BACKEND_BASE}/api/bookings`, {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        })
-
         // build payload and avoid sending `branch: null` which fails enum validation
         const payload = {
           movieId: booking.movieId,
