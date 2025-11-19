@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middleware/verifyToken');
 const mongoose = require('mongoose');
+const AuditLog = require('../models/AuditLog');
 
 const ReviewSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -20,6 +21,18 @@ router.post('/', verifyToken, async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Please login' });
     if (!movieId || !rating) return res.status(400).json({ message: 'Missing movieId or rating' });
     const review = await Review.create({ userId, movieId, rating, comment });
+    // create audit log for rating
+    try {
+      await AuditLog.create({
+        actorId: userId,
+        action: 'RATE',
+        movieId: movieId,
+        branch: req.user?.branch || null,
+        details: { rating, comment }
+      });
+    } catch (alErr) {
+      console.error('[Reviews] Failed to create audit log for rate:', alErr);
+    }
     return res.status(201).json({ review });
   } catch (err) {
     return res.status(500).json({ message: 'server error' });

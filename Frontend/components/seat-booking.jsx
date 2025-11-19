@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import "../styles/seat-booking.css";
@@ -106,12 +106,13 @@ export default function SeatBooking(props) {
   }
 
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="seat-booking">
       <Modal open={showLoginModal} onClose={() => setShowLoginModal(false)} title="Please login first">
         <p style={{ marginBottom: 24 }}>You must be signed in to book seats.</p>
-        <a href="/login" className="btn-primary" style={{ marginRight: 12 }}>Go to Login</a>
+        <a href={`/login?next=${encodeURIComponent(pathname)}`} className="btn-primary" style={{ marginRight: 12 }}>Go to Login</a>
       </Modal>
       {/* Header */}
       <div className="booking-header">

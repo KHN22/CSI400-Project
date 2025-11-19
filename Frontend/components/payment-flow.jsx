@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { CheckCircle2, QrCode } from "lucide-react"
 import { bookingsApi } from "@/lib/api"
 import Modal from "@/components/ui/modal"
@@ -11,6 +11,7 @@ export function PaymentFlow({ bookingData }) {
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const router = useRouter()
+  const pathname = usePathname()
     useEffect(() => {
       async function fetchUser() {
         try {
@@ -105,7 +106,7 @@ export function PaymentFlow({ bookingData }) {
     <div className="payment-container">
       <Modal open={showLoginModal} onClose={() => setShowLoginModal(false)} title="Please login first">
         <p style={{ marginBottom: 24 }}>You must be signed in to complete a booking or payment.</p>
-        <a href="/login" className="btn-primary" style={{ marginRight: 12 }}>Go to Login</a>
+        <a href={`/login?next=${encodeURIComponent(pathname)}`} className="btn-primary" style={{ marginRight: 12 }}>Go to Login</a>
       </Modal>
       <div className="payment-header">
         <h1>Complete Payment</h1>

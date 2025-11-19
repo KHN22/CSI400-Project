@@ -3,6 +3,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import "@/styles/buttons.css";
 import { BACKEND_BASE } from "../lib/api";
+import { toast } from '@/hooks/use-toast'
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -16,7 +17,10 @@ export default function LogoutButton() {
     } catch (e) {
       // ignore
     }
-
+    // show a brief toast to confirm logout
+    try {
+      toast({ title: 'Logged out', description: 'You have been signed out.' })
+    } catch (e) {}
     try { window.dispatchEvent(new Event("auth-changed")); } catch(e){}
     try { localStorage.setItem("auth", String(Date.now())); } catch(e){}
     try { new BroadcastChannel("auth").postMessage("changed"); } catch(e){}

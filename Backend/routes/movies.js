@@ -1,5 +1,6 @@
 const express = require('express');
 const Movie = require('../models/Movie');
+const AuditLog = require('../models/AuditLog');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -111,6 +112,18 @@ router.post('/', verifyToken, async (req, res) => {
     payload.createdBy = req.user?._id || req.user?.id || null;
     const movie = new Movie(payload);
     await movie.save();
+    // create audit log for adding movie
+    try {
+      await AuditLog.create({
+        actorId: req.user?._id || req.user?.id || null,
+        action: 'ADD_MOVIE',
+        movieId: movie._id,
+        branch: movie.branch || req.user?.branch || null,
+        details: { title: movie.title }
+      });
+    } catch (alErr) {
+      console.error('[Movies] Failed to create audit log for add movie:', alErr);
+    }
     res.status(201).json({ movie });
   } catch (err) {
     console.error('[Movies] Create error:', err);
@@ -156,6 +169,19 @@ router.patch('/:id', verifyToken, async (req, res) => {
         return res.status(403).json({ message: 'Forbidden: branch mismatch' });
       }
     }
+    // create audit log for edit
+    try {
+      await AuditLog.create({
+        actorId: req.user?._id || req.user?.id || null,
+        action: 'EDIT_MOVIE',
+        movieId: movie._id,
+        branch: movie.branch || req.user?.branch || null,
+        details: { changes: req.body }
+      });
+    } catch (alErr) {
+      console.error('[Movies] Failed to create audit log for edit movie:', alErr);
+    }
+
     res.json({ movie });
   } catch (err) {
     console.error('[Movies] Update error:', err);
@@ -190,6 +216,19 @@ router.delete('/:id', verifyToken, async (req, res) => {
         return res.status(403).json({ message: 'Forbidden: branch mismatch' });
       }
     }
+    // create audit log for delete
+    try {
+      await AuditLog.create({
+        actorId: req.user?._id || req.user?.id || null,
+        action: 'EDIT_MOVIE',
+        movieId: movie._id,
+        branch: movie.branch || req.user?.branch || null,
+        details: { deleted: true, title: movie.title }
+      });
+    } catch (alErr) {
+      console.error('[Movies] Failed to create audit log for delete movie:', alErr);
+    }
+
     res.json({ message: 'Movie deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

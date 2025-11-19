@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "@/styles/buttons.css";
 import { BACKEND_BASE } from "@/lib/api";
+import { toast } from '@/hooks/use-toast'
 
 export default function LoginInner() {
   const router = useRouter();
@@ -58,13 +59,16 @@ export default function LoginInner() {
       });
 
       if (res.ok) {
+        try { toast({ title: 'Signed in', description: 'Welcome back.' }) } catch(e){}
         try { window.dispatchEvent(new Event("auth-changed")); } catch(e){}
         try { localStorage.setItem("auth", String(Date.now())); } catch(e){}
         try { new BroadcastChannel("auth").postMessage("changed"); } catch(e){}
         router.push(from);
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data?.message || "Login failed");
+        const msg = data?.message || "Login failed"
+        setError(msg);
+        try { toast({ title: 'Login failed', description: msg, variant: 'destructive' }) } catch(e){}
       }
     } catch (err) {
       setError("Network error. Ensure backend is reachable.");
@@ -105,6 +109,7 @@ export default function LoginInner() {
           body: JSON.stringify({ email: registerData.email, password: registerData.password }),
         });
         if (loginRes.ok) {
+          try { toast({ title: 'Signed in', description: 'Welcome — your account is ready.' }) } catch(e){}
           try { window.dispatchEvent(new Event("auth-changed")); } catch(e){}
           try { localStorage.setItem("auth", String(Date.now())); } catch(e){}
           try { new BroadcastChannel("auth").postMessage("changed"); } catch(e){}
@@ -119,7 +124,9 @@ export default function LoginInner() {
         setRegisterError(data?.message || "Registration failed");
       }
     } catch {
-      setRegisterError("Network error. Ensure backend is running.");
+      const msg = "Network error. Ensure backend is running."
+      setRegisterError(msg);
+      try { toast({ title: 'Registration failed', description: msg, variant: 'destructive' }) } catch(e){}
     }
   };
 

@@ -259,5 +259,34 @@ router.get('/me', verifyToken, async (req, res) => {
   }
 });
 
+/**
+ * POST /api/auth/branch
+ * Update the current user's active branch and refresh the auth cookie
+ */
+router.post('/branch', verifyToken, async (req, res) => {
+  try {
+    const { branch } = req.body;
+    const { _id, email, role } = req.user;
+
+    // allow null or string branch; no strict validation here (could be extended)
+    await User.findByIdAndUpdate(_id, { branch: branch || null });
+
+    // issue a new token with updated branch
+    const token = jwt.sign({ sub: _id, email: email, role: role, branch: branch || null }, JWT_SECRET, { expiresIn: '7d' });
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      sameSite: 'None',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    return res.json({ message: 'branch updated', branch: branch || null });
+  } catch (err) {
+    console.error('Error updating branch:', err);
+    return res.status(500).json({ message: 'server error' });
+  }
+});
+
 
 module.exports = router;

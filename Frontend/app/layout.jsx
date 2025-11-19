@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { Toaster } from "@/components/ui/toaster";
 import "../styles/globals.css";
 import "../styles/profile.css"; // added to ensure profile page styles are applied
 
@@ -15,6 +16,9 @@ export default function RootLayout({ children }) {
       <body>
         {/* use the original Navbar which now includes AuthStatus/Logout */}
         <Navbar />
+
+        {/* Global toaster for toast notifications */}
+        <Toaster />
 
         {/* Make main the centered container so every page content is balanced */}
         <main className="container">{children}</main>

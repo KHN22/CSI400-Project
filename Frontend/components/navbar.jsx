@@ -5,6 +5,7 @@ import AuthStatus from "./auth-status";
 import LogoutButton from "./logout-button";
 import "../styles/navbar.css";
 import { BACKEND_BASE } from "../lib/api";
+import { toast } from '@/hooks/use-toast'
 
 export function Navbar() {
   const [user, setUser] = useState(null);
@@ -62,6 +63,30 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
+  // change the active branch for the current user
+  const handleSelectBranch = async (branch) => {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/api/auth/branch`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ branch }),
+      });
+
+      if (res.ok) {
+        try { toast({ title: 'Branch updated', description: branch ? `Active branch: ${branch}` : 'No branch selected' }) } catch(e){}
+        await loadUser();
+        setMenuOpen(null);
+      } else {
+        const d = await res.json().catch(() => ({}));
+        const msg = d?.message || 'Could not change branch';
+        try { toast({ title: 'Change branch failed', description: msg, variant: 'destructive' }) } catch(e){}
+      }
+    } catch (err) {
+      try { toast({ title: 'Network error', description: 'Could not reach server', variant: 'destructive' }) } catch(e){}
+    }
+  }
+
   useEffect(() => {
     if (!menuOpen) return;
     function handleDoc(e) {
@@ -88,6 +113,19 @@ export function Navbar() {
                 <Link href="/bookings" className="cb-dropdown-item">Booking History</Link>
                 <Link href="/bookings/review" className="cb-dropdown-item">Review</Link>
                 <Link href="/bookings/refund" className="cb-dropdown-item">Refund</Link>
+              </div>
+            )}
+          </div>
+        )}
+        {user && (
+          <div className="cb-dropdown" onMouseEnter={() => setMenuOpen('branch')} onMouseLeave={() => setMenuOpen(null)}>
+            <button className="cb-link" type="button">Branch ▼</button>
+            {menuOpen === 'branch' && (
+              <div className="cb-dropdown-menu">
+                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch(null)}>No Branch</button>
+                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch A')}>Branch A</button>
+                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch B')}>Branch B</button>
+                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch C')}>Branch C</button>
               </div>
             )}
           </div>
