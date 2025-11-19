@@ -51,7 +51,10 @@ router.get('/', requireBranchAdminOrManager, async (req, res) => {
         salesCount: salesBookings.length,
         refundedCount: refundedBookings.length,
         bookings,
-        statement: stmt
+        statement: stmt,
+        // backwards-compatible fields used by the frontend
+        count: bookings.length,
+        total: net
       });
     } catch (e) {
       console.warn('[Statements] failed to persist statement:', e);
@@ -62,7 +65,10 @@ router.get('/', requireBranchAdminOrManager, async (req, res) => {
         bookingsCount: bookings.length,
         salesCount: salesBookings.length,
         refundedCount: refundedBookings.length,
-        bookings
+        bookings,
+        // backwards-compatible fields
+        count: bookings.length,
+        total: net
       });
     }
   } catch (err) {

@@ -149,6 +149,16 @@ export const reviewsApi = {
     if (!res.ok) throw new Error('Failed to fetch reviews');
     return res.json();
   }
+  ,
+  // fetch all movieIds the current authenticated user has reviewed
+  getMyReviewedMovieIds: async () => {
+    const res = await fetch(`${BACKEND_BASE}/api/reviews/mine`, { credentials: 'include' });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`getMyReviewedMovieIds failed ${res.status}: ${t}`);
+    }
+    return res.json(); // { movieIds: [...] }
+  }
 };
 
 // Requests API for regular users
