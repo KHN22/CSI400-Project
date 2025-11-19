@@ -101,6 +101,25 @@ export const adminApi = {
   }
 }
 
+// Reviews API (public create/list)
+export const reviewsApi = {
+  post: async (movieId, rating, comment) => {
+    const res = await fetch(`${BACKEND_BASE}/api/reviews`, { credentials: 'include', method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ movieId, rating, comment }) });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`reviewsApi.post failed ${res.status}: ${t}`);
+    }
+    return res.json();
+  },
+
+  listByMovie: async (movieId) => {
+    const qs = movieId ? `?movieId=${encodeURIComponent(movieId)}` : '';
+    const res = await fetch(`${BACKEND_BASE}/api/reviews${qs}`);
+    if (!res.ok) throw new Error('Failed to fetch reviews');
+    return res.json();
+  }
+};
+
 // Auth helper for frontend components to fetch current user from backend
 export const authApi = {
   getMe: async () => {
@@ -119,4 +138,9 @@ adminApi.patchRequest = async (id, body) => {
     throw new Error(`patchRequest failed ${res.status}: ${t}`);
   }
   return res.json();
+};
+
+// Convenience wrapper to create a refund request via admin requests endpoint
+adminApi.requestRefund = async (bookingId, reason) => {
+  return adminApi.postRequest({ type: 'refund', payload: { bookingId, reason } });
 };
