@@ -4,6 +4,12 @@ import { useParams, useRouter } from "next/navigation";
 import "@/styles/booking-history.css";
 import { BACKEND_BASE } from "@/lib/api";
 
+function formatBranch(branch) {
+  if (!branch) return "Unknown"
+  const map = { A: "Branch A", B: "Branch B", C: "Branch C" }
+  return map[branch] || branch
+}
+
 export default function BookingConfirmationPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -53,6 +59,7 @@ export default function BookingConfirmationPage() {
         <div>Showtime: {showtime}</div>
         <div>Seats: {seats.join(", ")}</div>
         <div>Total: ฿{Number(total).toLocaleString()}</div>
+        <div>Branch: {formatBranch(booking.branch)}</div>
         <div style={{ marginTop: 12 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <button

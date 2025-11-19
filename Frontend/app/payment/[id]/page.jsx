@@ -67,6 +67,7 @@ export default function PaymentPage() {
             seats: booking.seats,
             ticketPrice: booking.ticketPrice,
             totalPrice: booking.totalPrice,
+            branch: booking.branch || null,
             status: "paid"
           })
         });

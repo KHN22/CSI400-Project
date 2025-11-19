@@ -60,7 +60,17 @@ export function Navbar() {
 
   const canViewAdmin = ["SuperAdmin", "Manager"].includes(user?.role);
   const canViewFunction = ["SuperAdmin", "Manager", "Staff"].includes(user?.role);
-  const adminTitle = user ? `Admin (${user.role}${user.branch ? ' — ' + user.branch : ''})` : "Admin";
+  function formatBranch(b) {
+    if (!b) return '';
+    const s = String(b).trim();
+    if (!s) return '';
+    if (/^branch/i.test(s)) return s;
+    const up = s.toUpperCase();
+    if (/^[ABC]$/.test(up)) return `Branch ${up}`;
+    return s;
+  }
+
+  const adminTitle = user ? `Admin (${user.role}${user.branch ? ' — ' + formatBranch(user.branch) : ''})` : "Admin";
   // separate state for center dropdowns (bookings/branch) and right-side profile menu
   const [centerMenu, setCenterMenu] = useState(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -78,6 +88,9 @@ export function Navbar() {
 
         if (res.ok) {
         try { toast({ title: 'Branch updated', description: branch ? `Active branch: ${branch}` : 'No branch selected' }) } catch(e){}
+        // persist selected branch locally for client-side components and notify listeners
+        try { localStorage.setItem('selectedBranch', branch || ''); } catch(e){}
+        try { window.dispatchEvent(new Event('branch-changed')); } catch(e){}
         await loadUser();
         setCenterMenu(null);
       } else {
@@ -124,13 +137,13 @@ export function Navbar() {
           <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('branch')} onMouseLeave={() => setCenterMenu(null)}>
             <button className="cb-link" type="button">Branch ▼</button>
             {centerMenu === 'branch' && (
-              <div className="cb-dropdown-menu">
-                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch(null)}>No Branch</button>
-                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch A')}>Branch A</button>
-                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch B')}>Branch B</button>
-                <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch C')}>Branch C</button>
-              </div>
-            )}
+                  <div className="cb-dropdown-menu">
+                    <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch(null)}>No Branch</button>
+                    <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('A')}>Branch A</button>
+                    <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('B')}>Branch B</button>
+                    <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('C')}>Branch C</button>
+                  </div>
+                )}
           </div>
         )}
         {canViewFunction && (
@@ -160,7 +173,7 @@ export function Navbar() {
               style={{ display: "flex", gap: 8, alignItems: "center" }}
             >
               <span style={{ fontWeight: 600 }}>{user.email?.split("@")[0] || user.username || user.email}</span>
-              <span style={{ fontSize: 12, opacity: 0.8 }}>{user.role}{user.branch ? ` • ${user.branch}` : ""}</span>
+              <span style={{ fontSize: 12, opacity: 0.8 }}>{user.role}{user.branch ? ` • ${formatBranch(user.branch)}` : ""}</span>
             </button>
 
             {profileMenuOpen && (

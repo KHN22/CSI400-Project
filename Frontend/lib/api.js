@@ -39,19 +39,40 @@ export const moviesApi = {
 // Bookings API
 export const bookingsApi = {
   getAll: async () => {
-    await delay(500)
-    return mockBookings
+    // Fetch bookings for current user from backend
+    const res = await fetch(`${BACKEND_BASE}/api/bookings`, { credentials: 'include' });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`bookingsApi.getAll failed ${res.status}: ${t}`);
+    }
+    const d = await res.json().catch(() => null);
+    return d?.bookings || [];
   },
 
   create: async (booking) => {
-    await delay(800)
-    const newBooking = {
-      ...booking,
-      id: `booking-${Date.now()}`,
-      status: "confirmed",
+    // send booking to backend for persistence
+    const payload = {
+      movieId: booking.movieId,
+      showtime: booking.showtime,
+      seats: booking.seats,
+      ticketPrice: booking.ticketPrice || 0,
+      totalPrice: booking.totalPrice || booking.total || 0,
+      branch: booking.branch || null,
+    };
+
+    const res = await fetch(`${BACKEND_BASE}/api/bookings`, {
+      credentials: 'include',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`bookingsApi.create failed ${res.status}: ${t}`);
     }
-    mockBookings.push(newBooking)
-    return newBooking
+    const d = await res.json().catch(() => null);
+    return d?.booking || d || null;
   },
 }
 

@@ -5,6 +5,12 @@ import { bookingsApi, BACKEND_BASE } from "@/lib/api"
 import { Calendar, Clock, MapPin, Ticket } from "lucide-react"
 import "../styles/booking-history.css"
 
+function formatBranch(branch) {
+  if (!branch) return "Unknown"
+  const map = { A: "Branch A", B: "Branch B", C: "Branch C" }
+  return map[branch] || branch
+}
+
 export default function BookingHistory() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -60,6 +66,7 @@ export default function BookingHistory() {
           <li key={b._id || b.id} className="card" style={{ marginBottom: 10 }}>
             <div><strong>{b.title}</strong></div>
             <div><small className="text-muted">{b.showtime}</small></div>
+            <div><small className="text-muted">Branch: {formatBranch(b.branch)}</small></div>
             <div>Seats: {(b.seats || []).join(", ")}</div>
             <div><small className="text-muted">Booked: {new Date(b.createdAt).toLocaleString()}</small></div>
           </li>

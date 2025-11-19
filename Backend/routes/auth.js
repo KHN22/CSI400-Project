@@ -269,10 +269,23 @@ router.post('/branch', verifyToken, async (req, res) => {
     const { _id, email, role } = req.user;
 
     // allow null or string branch; no strict validation here (could be extended)
-    await User.findByIdAndUpdate(_id, { branch: branch || null });
+    // normalize incoming branch to single-letter codes (A/B/C)
+    function normalizeBranch(raw) {
+      if (!raw) return null;
+      const s = String(raw).trim();
+      if (!s) return null;
+      const upper = s.toUpperCase();
+      if (['A','B','C'].includes(upper)) return upper;
+      const m = s.match(/([A-C])$/i);
+      if (m && m[1]) return m[1].toUpperCase();
+      return null;
+    }
+
+    const normalized = normalizeBranch(branch);
+    await User.findByIdAndUpdate(_id, { branch: normalized || null });
 
     // issue a new token with updated branch
-    const token = jwt.sign({ sub: _id, email: email, role: role, branch: branch || null }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ sub: _id, email: email, role: role, branch: normalized || null }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie(COOKIE_NAME, token, {
       httpOnly: true,
       sameSite: 'None',

@@ -5,6 +5,12 @@ import { Calendar, Clock, MapPin, Ticket } from "lucide-react"
 import "@/styles/booking-history.css"
 import { BACKEND_BASE } from "@/lib/api"
 
+function formatBranch(branch) {
+  if (!branch) return "Unknown"
+  const map = { A: "Branch A", B: "Branch B", C: "Branch C" }
+  return map[branch] || branch
+}
+
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -174,6 +180,10 @@ export default function BookingsPage() {
                         <div className="booking-meta-item">
                           <MapPin />
                           <span style={{ color: "#aeb7c6" }}>{seatsStr}</span>
+                        </div>
+
+                        <div className="booking-meta-item">
+                          <span style={{ color: "#aeb7c6" }}>Branch: {formatBranch(b.branch)}</span>
                         </div>
 
                         <div className="booking-meta-item tickets">

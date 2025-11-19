@@ -16,14 +16,22 @@ export function MovieGrid() {
       setLoading(true);
       setErr("");
       try {
-        // Fetch movies for selected branch (from localStorage). Default branch A.
-        const selectedBranch = (() => { try { return localStorage.getItem('selectedBranch') || 'A' } catch(e){ return 'A' } })();
+        // Determine selected branch: prefer localStorage, fall back to user's branch from /api/auth/me
+        let selectedBranch = null;
+        try { selectedBranch = localStorage.getItem('selectedBranch') || null } catch(e) { selectedBranch = null }
+        if (!selectedBranch) {
+          try {
+            const r = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: 'include' });
+            if (r.ok) {
+              const p = await r.json().catch(()=>null);
+              const u = p?.user || p || null;
+              if (u && u.branch) selectedBranch = u.branch;
+            }
+          } catch(e) { /* ignore */ }
+        }
         const url = new URL(`${BACKEND_BASE}/api/movies`);
         if (selectedBranch) url.searchParams.set('branch', selectedBranch);
-        const res = await fetch(url.toString(), {
-          credentials: 'include',
-          headers: { 'Accept': 'application/json' }
-        });
+        const res = await fetch(url.toString(), { credentials: 'include', headers: { 'Accept': 'application/json' } });
         
         console.log("[MovieGrid] fetch response:", {
           url: res.url,

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { CheckCircle2, QrCode } from "lucide-react"
 import { bookingsApi } from "@/lib/api"
+import { toast } from '@/hooks/use-toast'
 import Modal from "@/components/ui/modal"
 import "../styles/payment.css"
 
@@ -46,11 +47,13 @@ export function PaymentFlow({ bookingData }) {
         showtime: bookingData.showtime,
         seats: bookingData.seats,
         total: bookingData.total,
+        branch: bookingData.branch || null,
       });
+      try { toast({ title: 'Payment successful', description: 'Your booking has been confirmed.' }) } catch(e){}
       setIsComplete(true);
     } catch (error) {
       console.error("Payment failed:", error);
-      alert("Payment failed. Please try again.");
+      try { toast({ title: 'Payment failed', description: error?.message || 'Please try again.', variant: 'destructive' }) } catch(e){}
     } finally {
       setIsPaying(false);
     }

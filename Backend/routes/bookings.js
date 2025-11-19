@@ -4,6 +4,21 @@ const Booking = require('../models/Booking');
 const AuditLog = require('../models/AuditLog');
 const verifyToken = require('../middleware/verifyToken');
 
+// Normalize branch values coming from client (accept 'A'|'B'|'C' or 'Branch A' etc.)
+function normalizeBranch(raw) {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  const upper = s.toUpperCase();
+  if (['A','B','C'].includes(upper)) return upper;
+  // matches endings like 'Branch A' or 'branch-a' or similar
+  const m1 = s.match(/branch\s*[:\-]?\s*([A-C])$/i);
+  if (m1 && m1[1]) return m1[1].toUpperCase();
+  const m2 = s.match(/([A-C])$/i);
+  if (m2 && m2[1]) return m2[1].toUpperCase();
+  return null;
+}
+
 
 // <-- public route stays public
 /**
@@ -42,6 +57,11 @@ router.get('/movie/:movieId', async (req, res) => {
     const { showtime } = req.query;
     const filter = { movieId };
     if (showtime) filter.showtime = showtime;
+    // allow optional branch filter (accept 'Branch A' or 'A')
+    if (req.query.branch) {
+      const b = normalizeBranch(req.query.branch);
+      if (b) filter.branch = b;
+    }
     const bookings = await Booking.find(filter).select('seats -_id');
     const seats = bookings.flatMap(b => b.seats || []);
     return res.json({ seats });
@@ -123,6 +143,18 @@ router.post('/', async (req, res) => {
       return res.status(401).json({ message: 'Please login first' });
     }
 
+    // determine branch for this booking. Prefer validated client value, but fall back to user's token branch.
+    const tokenBranch = normalizeBranch(req.user?.branch) || null;
+    const incomingBranch = req.body.branch || null;
+    const normalizedIncoming = incomingBranch ? normalizeBranch(incomingBranch) : null;
+    let resolvedBranch = null;
+    if (normalizedIncoming && tokenBranch && normalizedIncoming !== tokenBranch) {
+      // conflict: prefer token branch (more trustworthy)
+      resolvedBranch = tokenBranch;
+    } else {
+      resolvedBranch = normalizedIncoming || tokenBranch || null;
+    }
+
     const booking = new Booking({
       userId: uid,
       movieId: req.body.movieId,
@@ -130,6 +162,7 @@ router.post('/', async (req, res) => {
       seats: req.body.seats,
       ticketPrice: req.body.ticketPrice,
       totalPrice: req.body.totalPrice,
+      branch: resolvedBranch,
       status: 'pending'
     });
 
@@ -143,7 +176,7 @@ router.post('/', async (req, res) => {
         action: 'BUY',
         movieId: booking.movieId,
         bookingId: booking._id,
-        branch: req.user?.branch || null,
+        branch: booking.branch || req.user?.branch || null,
         details: { seats: booking.seats, totalPrice: booking.totalPrice }
       });
     } catch (alErr) {

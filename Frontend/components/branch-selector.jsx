@@ -32,7 +32,10 @@ export default function BranchSelector(){
       })
       if(res.ok){
         setBranch(b)
-        try{ toast({ title: 'Branch updated', description: b ? `Active branch: ${b}` : 'No branch selected' }) }catch(e){}
+        const label = b ? `Branch ${b}` : 'No branch selected'
+        try{ toast({ title: 'Branch updated', description: label }) }catch(e){}
+        try{ localStorage.setItem('selectedBranch', b || '') }catch(e){}
+        try{ window.dispatchEvent(new Event('branch-changed')) }catch(e){}
         try{ window.dispatchEvent(new Event('auth-changed')) }catch(e){}
       } else {
         const d = await res.json().catch(()=>({}))
@@ -48,9 +51,9 @@ export default function BranchSelector(){
       <label style={{ fontSize: 14, opacity: 0.9 }}>Branch</label>
       <select value={branch || ''} onChange={(e)=>setBranchRequest(e.target.value || null)} disabled={loading} style={{ padding: 6, borderRadius: 6 }}>
         <option value="">No Branch</option>
-        <option value="Branch A">Branch A</option>
-        <option value="Branch B">Branch B</option>
-        <option value="Branch C">Branch C</option>
+        <option value="A">Branch A</option>
+        <option value="B">Branch B</option>
+        <option value="C">Branch C</option>
       </select>
     </div>
   )

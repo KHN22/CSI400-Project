@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import "../styles/seat-booking.css";
 import Modal from "@/components/ui/modal";
+import { toast } from '@/hooks/use-toast'
 
 const ROWS = ["A", "B", "C", "D", "E", "F"];
 const SEATS_PER_ROW = 8;
@@ -85,16 +86,31 @@ export default function SeatBooking(props) {
       // สร้าง draft booking ใน sessionStorage แทนการ POST ตอนนี้
       const ticketPrice = Number(movie.ticketPrice || 0);
       const totalPrice = selectedSeats.length * ticketPrice;
+      // include branch the user is currently using (client-side preference or server-side value)
+      let selectedBranch = null;
+      try { selectedBranch = localStorage.getItem('selectedBranch') || null } catch(e){ selectedBranch = null }
+      if (!selectedBranch) {
+        try {
+          const r = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: 'include' });
+          if (r.ok) {
+            const p = await r.json().catch(()=>null);
+            const u = p?.user || p || null;
+            if (u && u.branch) selectedBranch = u.branch;
+          }
+        } catch(e) { /* ignore */ }
+      }
+
       const draft = {
         movieId: movie._id || movie.id,
         title: movie.title,
         showtime: selectedShowtime,
         seats: selectedSeats,
         ticketPrice,
-        totalPrice
+        totalPrice,
+        branch: selectedBranch || null
       };
       sessionStorage.setItem("pendingBooking", JSON.stringify(draft));
-
+      try { toast({ title: 'Draft saved', description: 'Proceeding to payment.', }) } catch(e){}
       // ไปที่หน้า payment แบบ draft (dynamic route [id] จะรับค่า 'draft')
       router.push(`/payment/draft`);
     } catch (err) {
