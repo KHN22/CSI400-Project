@@ -60,7 +60,9 @@ export function Navbar() {
 
   const canViewAdmin = ["SuperAdmin", "Manager"].includes(user?.role);
   const adminTitle = user ? `Admin (${user.role}${user.branch ? ' — ' + user.branch : ''})` : "Admin";
-  const [menuOpen, setMenuOpen] = useState(false);
+  // separate state for center dropdowns (bookings/branch) and right-side profile menu
+  const [centerMenu, setCenterMenu] = useState(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   // change the active branch for the current user
@@ -88,14 +90,14 @@ export function Navbar() {
   }
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!profileMenuOpen) return;
     function handleDoc(e) {
       if (!menuRef.current) return;
-      if (!menuRef.current.contains(e.target)) setMenuOpen(false);
+      if (!menuRef.current.contains(e.target)) setProfileMenuOpen(false);
     }
     document.addEventListener("pointerdown", handleDoc);
     return () => document.removeEventListener("pointerdown", handleDoc);
-  }, [menuOpen]);
+  }, [profileMenuOpen]);
 
   return (
     <nav className="cb-navbar">
@@ -106,9 +108,9 @@ export function Navbar() {
       <div className="cb-navbar-center">
         <Link href="/" className="cb-link">Home</Link>
         {user && (
-          <div className="cb-dropdown" onMouseEnter={() => setMenuOpen('bookings')} onMouseLeave={() => setMenuOpen(null)}>
+          <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('bookings')} onMouseLeave={() => setCenterMenu(null)}>
             <button className="cb-link" type="button">Bookings ▼</button>
-            {menuOpen === 'bookings' && (
+            {centerMenu === 'bookings' && (
               <div className="cb-dropdown-menu">
                 <Link href="/bookings" className="cb-dropdown-item">Booking History</Link>
                 <Link href="/bookings/review" className="cb-dropdown-item">Review</Link>
@@ -118,28 +120,14 @@ export function Navbar() {
           </div>
         )}
         {user && (
-          <div className="cb-dropdown" onMouseEnter={() => setMenuOpen('branch')} onMouseLeave={() => setMenuOpen(null)}>
+          <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('branch')} onMouseLeave={() => setCenterMenu(null)}>
             <button className="cb-link" type="button">Branch ▼</button>
-            {menuOpen === 'branch' && (
+            {centerMenu === 'branch' && (
               <div className="cb-dropdown-menu">
                 <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch(null)}>No Branch</button>
                 <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch A')}>Branch A</button>
                 <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch B')}>Branch B</button>
                 <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('Branch C')}>Branch C</button>
-              </div>
-            )}
-          </div>
-        )}
-        {user && (
-          <div className="cb-dropdown" onMouseEnter={() => setMenuOpen('profile')} onMouseLeave={() => setMenuOpen(null)}>
-            <button className="cb-link" type="button">Profile ▼</button>
-            {menuOpen === 'profile' && (
-              <div className="cb-dropdown-menu">
-                <Link href="/profile" className="cb-dropdown-item">Profile Home</Link>
-                <Link href="/profile/movies" className="cb-dropdown-item">Movies Panel</Link>
-                <Link href="/profile/requests" className="cb-dropdown-item">Requests Panel</Link>
-                <Link href="/profile/statements" className="cb-dropdown-item">Statements Panel</Link>
-                <Link href="/profile/users" className="cb-dropdown-item">Users Panel</Link>
               </div>
             )}
           </div>
@@ -156,8 +144,8 @@ export function Navbar() {
           <div ref={menuRef} style={{ position: "relative" }}>
             <button
               className="btn-link"
-              onClick={() => setMenuOpen((s) => !s)}
-              aria-expanded={menuOpen}
+              onClick={() => setProfileMenuOpen((s) => !s)}
+              aria-expanded={profileMenuOpen}
               aria-haspopup="menu"
               style={{ display: "flex", gap: 8, alignItems: "center" }}
             >
@@ -165,7 +153,7 @@ export function Navbar() {
               <span style={{ fontSize: 12, opacity: 0.8 }}>{user.role}{user.branch ? ` • ${user.branch}` : ""}</span>
             </button>
 
-            {menuOpen && (
+            {profileMenuOpen && (
               <div className="cb-menu" role="menu" style={{ position: "absolute", right: 0, marginTop: 8, background: "white", border: "1px solid #e6e6e6", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.08)", padding: 8, minWidth: 180 }}>
                 <Link href="/profile" className="cb-menu-item" role="menuitem">Profile</Link>
                 <Link href="/bookings" className="cb-menu-item" role="menuitem">My Bookings</Link>
