@@ -59,6 +59,7 @@ export function Navbar() {
   }, []);
 
   const canViewAdmin = ["SuperAdmin", "Manager"].includes(user?.role);
+  const canViewFunction = ["SuperAdmin", "Manager", "Staff"].includes(user?.role);
   const adminTitle = user ? `Admin (${user.role}${user.branch ? ' — ' + user.branch : ''})` : "Admin";
   // separate state for center dropdowns (bookings/branch) and right-side profile menu
   const [centerMenu, setCenterMenu] = useState(null);
@@ -75,10 +76,10 @@ export function Navbar() {
         body: JSON.stringify({ branch }),
       });
 
-      if (res.ok) {
+        if (res.ok) {
         try { toast({ title: 'Branch updated', description: branch ? `Active branch: ${branch}` : 'No branch selected' }) } catch(e){}
         await loadUser();
-        setMenuOpen(null);
+        setCenterMenu(null);
       } else {
         const d = await res.json().catch(() => ({}));
         const msg = d?.message || 'Could not change branch';
@@ -132,10 +133,19 @@ export function Navbar() {
             )}
           </div>
         )}
-        {canViewAdmin && (
-          <Link href="/admin" className="cb-link" title={adminTitle}>
-            Admin
-          </Link>
+        {canViewFunction && (
+          <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('function')} onMouseLeave={() => setCenterMenu(null)}>
+            <button className="cb-link" type="button">Function ▼</button>
+            {centerMenu === 'function' && (
+              <div className="cb-dropdown-menu">
+                <Link href="/profile/users" className="cb-dropdown-item">User Manage</Link>
+                <Link href="/profile/movies" className="cb-dropdown-item">Movie Manage</Link>
+                <Link href="/admin/auditlogs" className="cb-dropdown-item">Audit Logs</Link>
+                <Link href="/profile/requests" className="cb-dropdown-item">Requests</Link>
+                <Link href="/profile/statements" className="cb-dropdown-item">Statements</Link>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -160,14 +170,7 @@ export function Navbar() {
                 <Link href="/profile/statements" className="cb-menu-item" role="menuitem">Statements</Link>
                 <Link href="/profile/requests" className="cb-menu-item" role="menuitem">Requests Panel</Link>
                 <Link href="/bookings" className="cb-menu-item" role="menuitem">My Bookings</Link>
-                {canViewAdmin ? (
-                  <>
-                    <Link href="/admin" className="cb-menu-item" role="menuitem" title={adminTitle}>Admin</Link>
-                    <Link href="/admin" className="cb-menu-item" role="menuitem">Audit Logs</Link>
-                  </>
-                ) : (
-                  <div className="cb-menu-item disabled" role="menuitem" title={user.role ? "You do not have Admin access" : "Sign in to access Admin"} style={{ opacity: 0.6, cursor: "default" }}>Admin</div>
-                )}
+                {/* Admin/function links are now available under the Function dropdown in the center nav */}
                 <div style={{ marginTop: 6 }}>
                   <LogoutButton />
                 </div>
