@@ -33,6 +33,22 @@ router.post('/', verifyToken, async (req, res) => {
     } catch (alErr) {
       console.error('[Reviews] Failed to create audit log for rate:', alErr);
     }
+    // recompute average rating for movie and persist on Movie
+    try {
+      const agg = await Review.aggregate([
+        { $match: { movieId: mongoose.Types.ObjectId(String(movieId)) } },
+        { $group: { _id: '$movieId', avg: { $avg: '$rating' } } }
+      ]);
+      const avg = agg && agg[0] ? agg[0].avg : null;
+      if (avg !== null) {
+        // update movie.rating (store 1-5 avg)
+        const Movie = require('../models/Movie');
+        await Movie.findByIdAndUpdate(movieId, { rating: avg }, { new: true });
+      }
+    } catch (e) {
+      console.warn('[Reviews] Failed to update movie average rating:', e.message || e);
+    }
+
     return res.status(201).json({ review });
   } catch (err) {
     return res.status(500).json({ message: 'server error' });
@@ -61,6 +77,18 @@ router.delete('/:id', verifyToken, async (req, res) => {
       return res.status(403).json({ message: 'forbidden' });
     }
     await review.deleteOne();
+    // recompute and update movie rating after deletion
+    try {
+      const Movie = require('../models/Movie');
+      const agg = await Review.aggregate([
+        { $match: { movieId: mongoose.Types.ObjectId(String(review.movieId)) } },
+        { $group: { _id: '$movieId', avg: { $avg: '$rating' } } }
+      ]);
+      const avg = agg && agg[0] ? agg[0].avg : 0;
+      await Movie.findByIdAndUpdate(review.movieId, { rating: avg }, { new: true });
+    } catch (e) {
+      console.warn('[Reviews] Failed to update movie average rating after delete:', e.message || e);
+    }
     return res.json({ message: 'deleted' });
   } catch (err) {
     return res.status(500).json({ message: 'server error' });

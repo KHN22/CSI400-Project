@@ -62,6 +62,8 @@ router.get('/movie/:movieId', async (req, res) => {
       const b = normalizeBranch(req.query.branch);
       if (b) filter.branch = b;
     }
+    // exclude refunded bookings so seats are released when refunds are processed
+    filter.refunded = { $ne: true };
     const bookings = await Booking.find(filter).select('seats -_id');
     const seats = bookings.flatMap(b => b.seats || []);
     return res.json({ seats });
