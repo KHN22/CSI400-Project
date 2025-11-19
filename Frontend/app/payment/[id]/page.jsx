@@ -61,15 +61,33 @@ export default function PaymentPage() {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            movieId: booking.movieId,
-            showtime: booking.showtime,
-            seats: booking.seats,
-            ticketPrice: booking.ticketPrice,
-            totalPrice: booking.totalPrice,
-            branch: booking.branch || null,
-            status: "paid"
-          })
+        })
+
+        // build payload and avoid sending `branch: null` which fails enum validation
+        const payload = {
+          movieId: booking.movieId,
+          showtime: booking.showtime,
+          seats: booking.seats,
+          ticketPrice: booking.ticketPrice,
+          totalPrice: booking.totalPrice,
+          status: "paid"
+        }
+
+        // prefer branch on the draft, otherwise fallback to persisted selectedBranch
+        const branchFromDraft = booking.branch
+        let branchToSend = branchFromDraft
+        if (!branchToSend && typeof window !== 'undefined') {
+          const sel = window.localStorage.getItem('selectedBranch')
+          if (sel) branchToSend = sel
+        }
+        if (branchToSend) payload.branch = branchToSend
+
+        const res = await fetch(`${BACKEND_BASE}/api/bookings`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        })
         });
 
         if (!res.ok) {
