@@ -49,13 +49,15 @@ export default function RequestsPanel() {
       {loading ? <div>Loading requests…</div> : (
         <div>
           {filteredRequests.length === 0 ? <div style={{ color: '#888' }}>No requests</div> : (
-            <table className="table"><thead><tr><th>Type</th><th>By</th><th>Status</th><th>Action</th></tr></thead>
+            <table className="table"><thead><tr><th>ID</th><th>Type</th><th>By</th><th>Status</th><th>Approved By</th><th>Action</th></tr></thead>
               <tbody>
                 {filteredRequests.map(req => (
                   <tr key={req._id}>
+                    <td style={{ fontSize: 12, color: '#666' }}>{req._id}</td>
                     <td>{req.type}</td>
                     <td>{req.requesterId?.email}</td>
                     <td>{req.status}</td>
+                    <td>{req.approverId?.email || '-'}</td>
                     <td>
                       {me && (me.role === 'SuperAdmin' || (me.role === 'Manager' && req.payload?.branch === me.branch)) ? (
                         <>

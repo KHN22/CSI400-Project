@@ -141,6 +141,27 @@ export const reviewsApi = {
   }
 };
 
+// Requests API for regular users
+export const requestsApi = {
+  getMine: async () => {
+    const res = await fetch(`${BACKEND_BASE}/api/admin/requests/my`, { credentials: 'include' });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`requestsApi.getMine failed ${res.status}: ${t}`);
+    }
+    return res.json();
+  },
+
+  delete: async (id) => {
+    const res = await fetch(`${BACKEND_BASE}/api/admin/requests/${id}`, { credentials: 'include', method: 'DELETE' });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`requestsApi.delete failed ${res.status}: ${t}`);
+    }
+    return res.json();
+  }
+}
+
 // Auth helper for frontend components to fetch current user from backend
 export const authApi = {
   getMe: async () => {

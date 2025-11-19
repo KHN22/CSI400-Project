@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { bookingsApi, authApi, adminApi } from "@/lib/api";
+import { bookingsApi, authApi, adminApi, requestsApi } from "@/lib/api";
 
 export default function RefundPanel() {
   const [bookings, setBookings] = useState([]);
@@ -17,10 +17,19 @@ export default function RefundPanel() {
     try {
       const b = await bookingsApi.getAll();
       setBookings(b || []);
+      // also load user's own requests so we can disable duplicate submissions
+      try {
+        const my = await requestsApi.getMine();
+        setMyRequests(my.requests || []);
+      } catch (e) {
+        setMyRequests([]);
+      }
     } catch (e) {
       setBookings([]);
     } finally { setLoading(false); }
   }
+
+  const [myRequests, setMyRequests] = useState([]);
 
   useEffect(() => { (async () => { try { const u = await authApi.getMe(); setMe(u); } catch(e) { setMe(null); } })(); }, []);
 
@@ -36,9 +45,24 @@ export default function RefundPanel() {
       alert('Refund request submitted');
       setActiveBooking(null);
       setReason('');
+      // refresh bookings and requests
+      await load();
     } catch (err) {
       alert(err.message || 'Failed to submit refund request');
     } finally { setSubmitting(false); }
+  }
+
+  async function cancelRequestForBooking(booking) {
+    const bid = bookingId(booking);
+    const req = myRequests.find(r => r.type === 'refund' && String(r.payload?.bookingId) === String(bid) && r.status === 'pending');
+    if (!req) return alert('No pending refund request for this booking');
+    try {
+      await requestsApi.delete(req._id);
+      alert('Refund request cancelled');
+      await load();
+    } catch (e) {
+      alert(e.message || 'Failed to cancel request');
+    }
   }
 
   return (
@@ -57,7 +81,13 @@ export default function RefundPanel() {
                       <div style={{ fontSize: 12, color: '#666' }}>{b.status}</div>
                     </div>
                     <div>
-                      <button onClick={() => setActiveBooking(b)}>Request Refund</button>
+                      {myRequests && myRequests.find(r => r.type === 'refund' && String(r.payload?.bookingId) === String(bookingId(b)) && r.status === 'pending') ? (
+                        <>
+                          <button onClick={() => cancelRequestForBooking(b)}>Cancel Refund Request</button>
+                        </>
+                      ) : (
+                        <button onClick={() => setActiveBooking(b)}>Request Refund</button>
+                      )}
                     </div>
                   </div>
                 </li>

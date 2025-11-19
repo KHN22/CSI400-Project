@@ -34,6 +34,10 @@ const bookingSchema = new mongoose.Schema({
     enum: ['pending', 'confirmed', 'cancelled'],
     default: 'pending'
   },
+  // refund tracking (do not reuse status for refund semantics)
+  refunded: { type: Boolean, default: false },
+  refunder: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  refundedAt: { type: Date },
   createdAt: {
     type: Date,
     default: Date.now
