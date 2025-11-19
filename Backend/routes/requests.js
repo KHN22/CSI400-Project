@@ -97,11 +97,11 @@ router.patch('/:id', requireBranchAdminOrManager, async (req, res) => {
     r.actedAt = Date.now();
     await r.save();
 
-    // if an admin approved a refund request, perform booking refund update and audit
-    if (status === 'approved' && r.type === 'refund') {
+    // if an admin acted on a refund request, perform booking updates and audit
+    if (r.type === 'refund' && (status === 'approved' || status === 'rejected')) {
       try {
         const bookingId = r.payload?.bookingId;
-        if (bookingId) {
+        if (status === 'approved' && bookingId) {
           const booking = await Booking.findById(bookingId);
           if (booking) {
             // set refunded flags rather than reusing status
@@ -109,24 +109,24 @@ router.patch('/:id', requireBranchAdminOrManager, async (req, res) => {
             booking.refunder = req.user._id; // admin who processed refund
             booking.refundedAt = new Date();
             await booking.save();
-
-            // create audit log for refund
-            try {
-              await AuditLog.create({
-                actorId: req.user._id,
-                action: 'REFUND',
-                bookingId: booking._id,
-                movieId: booking.movieId,
-                branch: r.payload?.branch || booking.branch || 'A',
-                details: { requestId: r._id, requesterId: r.requesterId, reason: r.payload?.reason }
-              });
-            } catch (ae) {
-              console.warn('Failed to create audit log for refund:', ae);
-            }
           }
         }
+
+        // create audit log for either approve or reject so we always record who acted
+        try {
+          await AuditLog.create({
+            actorId: req.user._id,
+            action: 'REFUND',
+            bookingId: bookingId || null,
+            movieId: bookingId ? (await Booking.findById(bookingId)).movieId : null,
+            branch: r.payload?.branch || (bookingId ? (await Booking.findById(bookingId)).branch : 'A'),
+            details: { requestId: r._id, requesterId: r.requesterId, status, reason: r.payload?.reason }
+          });
+        } catch (ae) {
+          console.warn('Failed to create audit log for refund action:', ae);
+        }
       } catch (e) {
-        console.error('Error processing refund approval:', e);
+        console.error('Error processing refund action:', e);
       }
     }
 

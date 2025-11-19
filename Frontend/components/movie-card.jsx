@@ -49,7 +49,15 @@ export function MovieCard({ movie }) {
             className="movie-rating"
             style={{ visibility: movie.rating === undefined ? "hidden" : "visible" }}
           >
-          ⭐{movie.rating === 0 || movie.rating === undefined ? "N/A" : movie.rating}
+          {(() => {
+            const r = movie.rating;
+            if (r === undefined || r === null) return '⭐ N/A';
+            // Show 0.0 instead of "N/A" when rating is exactly 0
+            if (Number(r) === 0) return `⭐ ${Number(r).toFixed(1)}`;
+            // otherwise show rounded to 1 decimal
+            const rounded = (Math.round(Number(r) * 10) / 10).toFixed(1);
+            return `⭐ ${rounded}`;
+          })()}
           </div>
           <div className="movie-lenght">{movie.length} min</div>
         </div>
