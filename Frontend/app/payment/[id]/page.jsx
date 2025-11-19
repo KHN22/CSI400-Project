@@ -82,7 +82,6 @@ export default function PaymentPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         })
-        });
 
         if (!res.ok) {
           const txt = await res.text().catch(()=>null);
