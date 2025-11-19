@@ -139,16 +139,14 @@ export default function UsersPanel() {
                           </td>
                           <td>
                             {me && me.role === 'SuperAdmin' ? (
-                              <select value={u.branch || ''} onChange={(e)=>setBranch(u._id, e.target.value || null)} style={{ marginLeft: 8 }}>
-                                <option value="">No branch</option>
+                              <select value={u.branch || 'A'} onChange={(e)=>setBranch(u._id, e.target.value)} style={{ marginLeft: 8 }}>
                                 <option value="A">A</option>
                                 <option value="B">B</option>
                                 <option value="C">C</option>
                               </select>
                             ) : me && me.role === 'Manager' ? (
-                              <select value={u.branch || ''} onChange={(e)=>setBranch(u._id, e.target.value || null)} style={{ marginLeft: 8 }}>
-                                <option value="">No branch</option>
-                                <option value={me.branch}>{me.branch}</option>
+                              <select value={u.branch || me.branch || 'A'} onChange={(e)=>setBranch(u._id, e.target.value)} style={{ marginLeft: 8 }}>
+                                <option value={me.branch || 'A'}>{me.branch || 'A'}</option>
                               </select>
                             ) : (
                               <span>{u.branch || '-'}</span>

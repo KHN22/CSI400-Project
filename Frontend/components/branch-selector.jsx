@@ -4,7 +4,7 @@ import { BACKEND_BASE } from '@/lib/api'
 import { toast } from '@/hooks/use-toast'
 
 export default function BranchSelector(){
-  const [branch, setBranch] = useState(null)
+  const [branch, setBranch] = useState('A')
   const [loading, setLoading] = useState(false)
 
   useEffect(()=>{
@@ -16,7 +16,7 @@ export default function BranchSelector(){
         if(res.ok){
           const payload = await res.json()
           const u = payload.user || payload || null
-          setBranch(u?.branch || null)
+          setBranch(u?.branch || 'A')
         }
       }catch(e){}
     }
@@ -32,9 +32,9 @@ export default function BranchSelector(){
       })
       if(res.ok){
         setBranch(b)
-        const label = b ? `Branch ${b}` : 'No branch selected'
+        const label = `Branch ${b}`
         try{ toast({ title: 'Branch updated', description: label }) }catch(e){}
-        try{ localStorage.setItem('selectedBranch', b || '') }catch(e){}
+        try{ localStorage.setItem('selectedBranch', b) }catch(e){}
         try{ window.dispatchEvent(new Event('branch-changed')) }catch(e){}
         try{ window.dispatchEvent(new Event('auth-changed')) }catch(e){}
       } else {
@@ -49,8 +49,7 @@ export default function BranchSelector(){
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       <label style={{ fontSize: 14, opacity: 0.9 }}>Branch</label>
-      <select value={branch || ''} onChange={(e)=>setBranchRequest(e.target.value || null)} disabled={loading} style={{ padding: 6, borderRadius: 6 }}>
-        <option value="">No Branch</option>
+      <select value={branch || 'A'} onChange={(e)=>setBranchRequest(e.target.value || 'A')} disabled={loading} style={{ padding: 6, borderRadius: 6 }}>
         <option value="A">Branch A</option>
         <option value="B">Branch B</option>
         <option value="C">Branch C</option>

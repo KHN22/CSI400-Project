@@ -5,7 +5,7 @@ const auditLogSchema = new mongoose.Schema({
   action: { type: String, enum: ['BUY','REFUND','ADD_MOVIE','EDIT_MOVIE','RATE'], required: true },
   movieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Movie' },
   bookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking' },
-  branch: { type: String, enum: ['A','B','C'], default: null },
+  branch: { type: String, enum: ['A','B','C'], default: 'A' },
   details: { type: Object, default: {} },
   timestamp: { type: Date, default: Date.now }
 });

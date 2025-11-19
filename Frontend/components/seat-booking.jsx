@@ -87,8 +87,8 @@ export default function SeatBooking(props) {
       const ticketPrice = Number(movie.ticketPrice || 0);
       const totalPrice = selectedSeats.length * ticketPrice;
       // include branch the user is currently using (client-side preference or server-side value)
-      let selectedBranch = null;
-      try { selectedBranch = localStorage.getItem('selectedBranch') || null } catch(e){ selectedBranch = null }
+      let selectedBranch = 'A';
+      try { selectedBranch = localStorage.getItem('selectedBranch') || 'A' } catch(e){ selectedBranch = 'A' }
       if (!selectedBranch) {
         try {
           const r = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: 'include' });
@@ -107,7 +107,7 @@ export default function SeatBooking(props) {
         seats: selectedSeats,
         ticketPrice,
         totalPrice,
-        branch: selectedBranch || null
+        branch: selectedBranch
       };
       sessionStorage.setItem("pendingBooking", JSON.stringify(draft));
       try { toast({ title: 'Draft saved', description: 'Proceeding to payment.', }) } catch(e){}

@@ -211,8 +211,7 @@ export default function MoviesPanel() {
                 {me && me.role === 'SuperAdmin' && (
                   <div>
                     <label>Branch (SuperAdmin only)</label>
-                    <select value={form.branch || ''} onChange={(e)=>setForm({ ...form, branch: e.target.value || null })}>
-                      <option value="">No branch</option>
+                    <select value={form.branch || 'A'} onChange={(e)=>setForm({ ...form, branch: e.target.value })}>
                       <option value="A">A</option>
                       <option value="B">B</option>
                       <option value="C">C</option>

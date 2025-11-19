@@ -75,21 +75,22 @@ export function Navbar() {
   const [centerMenu, setCenterMenu] = useState(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const menuRef = useRef(null);
-
   // change the active branch for the current user
   const handleSelectBranch = async (branch) => {
     try {
+      // enforce a default branch of 'A' when none provided
+      const toSend = branch || 'A';
       const res = await fetch(`${BACKEND_BASE}/api/auth/branch`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ branch }),
+        body: JSON.stringify({ branch: toSend }),
       });
 
-        if (res.ok) {
-        try { toast({ title: 'Branch updated', description: branch ? `Active branch: ${branch}` : 'No branch selected' }) } catch(e){}
+      if (res.ok) {
+        try { toast({ title: 'Branch updated', description: `Active branch: ${toSend}` }) } catch(e){}
         // persist selected branch locally for client-side components and notify listeners
-        try { localStorage.setItem('selectedBranch', branch || ''); } catch(e){}
+        try { localStorage.setItem('selectedBranch', toSend); } catch(e){}
         try { window.dispatchEvent(new Event('branch-changed')); } catch(e){}
         await loadUser();
         setCenterMenu(null);
@@ -138,7 +139,6 @@ export function Navbar() {
             <button className="cb-link" type="button">Branch ▼</button>
             {centerMenu === 'branch' && (
                   <div className="cb-dropdown-menu">
-                    <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch(null)}>No Branch</button>
                     <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('A')}>Branch A</button>
                     <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('B')}>Branch B</button>
                     <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('C')}>Branch C</button>

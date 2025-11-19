@@ -17,8 +17,8 @@ export function MovieGrid() {
       setErr("");
       try {
         // Determine selected branch: prefer localStorage, fall back to user's branch from /api/auth/me
-        let selectedBranch = null;
-        try { selectedBranch = localStorage.getItem('selectedBranch') || null } catch(e) { selectedBranch = null }
+        let selectedBranch = 'A';
+        try { selectedBranch = localStorage.getItem('selectedBranch') || 'A' } catch(e) { selectedBranch = 'A' }
         if (!selectedBranch) {
           try {
             const r = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: 'include' });

@@ -7,8 +7,8 @@ const movieSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   // showtimes simple ISO strings or friendly text (we treat as strings for flexibility)
   showtimes: { type: [String], default: [] },
-  // branch this movie belongs to (A/B/C). null = available to all (or unassigned)
-  branch: { type: String, enum: ['A', 'B', 'C'], default: null },
+  // branch this movie belongs to (A/B/C). default to 'A'
+  branch: { type: String, enum: ['A', 'B', 'C'], default: 'A' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   ticketPrice: {
     type: Number,
