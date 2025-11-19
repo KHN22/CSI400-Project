@@ -130,7 +130,17 @@ export const reviewsApi = {
       const t = await res.text().catch(() => '');
       throw new Error(`reviewsApi.post failed ${res.status}: ${t}`);
     }
-    return res.json();
+    const json = await res.json();
+    // emit a client-side event so other components can refresh (MovieCard, MovieDetails)
+    try {
+      if (typeof window !== 'undefined') {
+        const ev = new CustomEvent('reviews-changed', { detail: { movieId } });
+        window.dispatchEvent(ev);
+      }
+    } catch (e) {
+      // ignore if events aren't supported
+    }
+    return json;
   },
 
   listByMovie: async (movieId) => {

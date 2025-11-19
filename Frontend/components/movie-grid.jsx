@@ -58,11 +58,13 @@ export function MovieGrid() {
         if (mounted) setLoading(false);
       }
     }
-    // reload when branch changes
+    // reload when branch or reviews change
     function onBranchChange(e) { load(); }
+    function onReviewsChanged(e) { load(); }
     window.addEventListener('branch-changed', onBranchChange);
+    window.addEventListener('reviews-changed', onReviewsChanged);
     load();
-    return () => { mounted = false; }
+    return () => { mounted = false; window.removeEventListener('branch-changed', onBranchChange); window.removeEventListener('reviews-changed', onReviewsChanged); }
   }, []);
 
   if (loading) return <div className="card">Loading movies…</div>;

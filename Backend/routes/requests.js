@@ -36,8 +36,16 @@ router.post('/', verifyToken, async (req, res) => {
       }
     }
 
-    const r = await RequestModel.create({ requesterId: uid, type, payload });
-    return res.status(201).json({ request: r });
+    try {
+      const r = await RequestModel.create({ requesterId: uid, type, payload });
+      return res.status(201).json({ request: r });
+    } catch (createErr) {
+      // handle duplicate key error from unique index for pending refund
+      if (createErr && createErr.code === 11000) {
+        return res.status(409).json({ message: 'Refund request already pending for this booking' });
+      }
+      throw createErr;
+    }
   } catch (err) {
     console.error('[Requests] Create error:', err);
     return res.status(500).json({ message: 'server error' });

@@ -71,8 +71,20 @@ export default function MovieInnerClient() {
 
     if (id) load();
 
+    // reload movie when reviews change for this movie
+    function onReviewsChanged(e) {
+      try {
+        const mid = e?.detail?.movieId;
+        if (!mid || String(mid) === String(id)) {
+          load();
+        }
+      } catch (err) { /* ignore */ }
+    }
+    window.addEventListener('reviews-changed', onReviewsChanged);
+
     return () => {
       mounted = false;
+      try { window.removeEventListener('reviews-changed', onReviewsChanged); } catch(e){}
     };
   }, [id, paramId, lastMovieId, showtime, router]);
 

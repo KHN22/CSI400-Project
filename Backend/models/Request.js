@@ -11,4 +11,7 @@ const requestSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Prevent duplicate pending refund requests for same booking + requester at DB level
+requestSchema.index({ 'payload.bookingId': 1, type: 1, requesterId: 1, status: 1 }, { unique: true, partialFilterExpression: { type: 'refund', status: 'pending' } });
+
 module.exports = mongoose.model('Request', requestSchema);

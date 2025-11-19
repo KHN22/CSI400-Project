@@ -40,6 +40,15 @@ export default function RequestsPanel() {
     ? requests.filter(r => r.payload?.branch === me.branch)
     : requests;
 
+  function renderStatusBadge(status) {
+    const s = String(status || '').toLowerCase();
+    const label = s ? (s.charAt(0).toUpperCase() + s.slice(1)) : 'Unknown';
+    let bg = '#9ca3af'; // gray for pending
+    if (s === 'approved') bg = '#10b981';
+    if (s === 'rejected') bg = '#ef4444';
+    return <span style={{ background: bg, color: 'white', padding: '4px 8px', borderRadius: 6, fontSize: 12 }}>{label}</span>;
+  }
+
   return (
     <section style={{ marginTop: 28 }}>
       <h2>Requests</h2>
@@ -49,15 +58,16 @@ export default function RequestsPanel() {
       {loading ? <div>Loading requests…</div> : (
         <div>
           {filteredRequests.length === 0 ? <div style={{ color: '#888' }}>No requests</div> : (
-            <table className="table"><thead><tr><th>ID</th><th>Type</th><th>By</th><th>Status</th><th>Approved By</th><th>Action</th></tr></thead>
+            <table className="table"><thead><tr><th>ID</th><th>Type</th><th>By</th><th>Status</th><th>Approved By</th><th>Acted At</th><th>Action</th></tr></thead>
               <tbody>
                 {filteredRequests.map(req => (
                   <tr key={req._id}>
                     <td style={{ fontSize: 12, color: '#666' }}>{req._id}</td>
                     <td>{req.type}</td>
                     <td>{req.requesterId?.email}</td>
-                    <td>{req.status}</td>
+                    <td>{renderStatusBadge(req.status)}</td>
                     <td>{req.approverId?.email || '-'}</td>
+                    <td style={{ fontSize: 12, color: '#666' }}>{req.actedAt ? new Date(req.actedAt).toLocaleString() : '-'}</td>
                     <td>
                       {me && (me.role === 'SuperAdmin' || (me.role === 'Manager' && req.payload?.branch === me.branch)) ? (
                         <>

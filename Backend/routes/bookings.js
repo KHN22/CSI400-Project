@@ -94,8 +94,8 @@ router.get('/', async (req, res) => {
     const userId = req.user?._id || req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Please login first' });
 
-    // Query by the field used when creating bookings (userId)
-    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
+    // Query bookings for the user. Exclude bookings that have been refunded.
+    const bookings = await Booking.find({ userId, refunded: { $ne: true } }).sort({ createdAt: -1 });
     return res.json({ bookings });
   } catch (err) {
     console.error('[Bookings] List error:', err);
