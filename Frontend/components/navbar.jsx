@@ -154,11 +154,17 @@ export function Navbar() {
             </button>
 
             {profileMenuOpen && (
-              <div className="cb-menu" role="menu" style={{ position: "absolute", right: 0, marginTop: 8, background: "white", border: "1px solid #e6e6e6", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.08)", padding: 8, minWidth: 180 }}>
-                <Link href="/profile" className="cb-menu-item" role="menuitem">Profile</Link>
+              <div className="cb-menu" role="menu" style={{ position: "absolute", right: 0, marginTop: 8, background: "white", border: "1px solid #e6e6e6", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.08)", padding: 8, minWidth: 220 }}>
+                <Link href="/profile" className="cb-menu-item" role="menuitem">Profile Home</Link>
+                <Link href="/profile/users" className="cb-menu-item" role="menuitem">User Panel</Link>
+                <Link href="/profile/statements" className="cb-menu-item" role="menuitem">Statements</Link>
+                <Link href="/profile/requests" className="cb-menu-item" role="menuitem">Requests Panel</Link>
                 <Link href="/bookings" className="cb-menu-item" role="menuitem">My Bookings</Link>
                 {canViewAdmin ? (
-                  <Link href="/admin" className="cb-menu-item" role="menuitem" title={adminTitle}>Admin</Link>
+                  <>
+                    <Link href="/admin" className="cb-menu-item" role="menuitem" title={adminTitle}>Admin</Link>
+                    <Link href="/admin" className="cb-menu-item" role="menuitem">Audit Logs</Link>
+                  </>
                 ) : (
                   <div className="cb-menu-item disabled" role="menuitem" title={user.role ? "You do not have Admin access" : "Sign in to access Admin"} style={{ opacity: 0.6, cursor: "default" }}>Admin</div>
                 )}
