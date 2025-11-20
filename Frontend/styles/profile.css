@@ -1,3 +1,8 @@
+body {
+  background-color: #0F172A;
+  color: white;
+}
+
 .profile-container {
   /* center the page content like homepage */
   max-width: 1100px;

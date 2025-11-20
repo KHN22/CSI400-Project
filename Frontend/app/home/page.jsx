@@ -8,7 +8,7 @@ export default function HomePage() {
       <div className="home-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 className="home-title">🍿 Now Showing</h1>
-          <BranchSelector />
+
         </div>
         <p className="home-subtitle">Book your tickets for the latest blockbusters</p>
       </div>

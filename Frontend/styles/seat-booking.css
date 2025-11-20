@@ -139,7 +139,7 @@
 
 /* Exclusive seats styling */
 .seat-button.exclusive.available {
-  background: #FDDC5C;
+  background: #eee8cf;
   color: #1a1a1a;
 }
 .seat-button.exclusive.selected {
