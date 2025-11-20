@@ -177,12 +177,9 @@ export function Navbar() {
 
             {profileMenuOpen && (
               <div className="cb-menu" role="menu" style={{ position: "absolute", right: 0, marginTop: 8, background: "#1e293b", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.2)", padding: 8, minWidth: 220 }}>
+                {/* Only show Profile Home and My Bookings in dropdown */}
                 <Link href="/profile" className="cb-menu-item" role="menuitem">Profile Home</Link>
-                <Link href="/profile/users" className="cb-menu-item" role="menuitem">User Panel</Link>
-                <Link href="/profile/statements" className="cb-menu-item" role="menuitem">Statements</Link>
-                <Link href="/profile/requests" className="cb-menu-item" role="menuitem">Requests Panel</Link>
                 <Link href="/bookings" className="cb-menu-item" role="menuitem">My Bookings</Link>
-                {/* Admin/function links are now available under the Function dropdown in the center nav */}
                 <div style={{ marginTop: 6 }}>
                   <LogoutButton />
                 </div>

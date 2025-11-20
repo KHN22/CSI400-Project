@@ -67,7 +67,7 @@ export default function RefundPanel() {
   }
 
   return (
-    <div>
+    <div className="refund-panel">
       <h2>Refunds</h2>
       <p>Request a refund for a booking. Admins will review requests in the Requests panel.</p>
       {loading ? <div>Loading…</div> : (
@@ -75,11 +75,11 @@ export default function RefundPanel() {
           {bookings.length === 0 ? <div>No bookings found</div> : (
             <ul>
               {bookings.map(b => (
-                <li key={bookingId(b)} style={{ marginBottom: 8 }}>
+                <li key={bookingId(b)}>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     <div style={{ flex: 1 }}>
                       <strong>{b.movieTitle || b.movie?.title || b.movie || 'Booking'}</strong>
-                      <div style={{ fontSize: 12, color: '#666' }}>{b.status}</div>
+                      <div style={{ fontSize: 12, color: '#94a3b8' }}>{b.status}</div>
                     </div>
                     <div>
                       {myRequests && myRequests.find(r => r.type === 'refund' && String(r.payload?.bookingId) === String(bookingId(b)) && r.status === 'pending') ? (
@@ -97,12 +97,12 @@ export default function RefundPanel() {
           )}
 
           {activeBooking && (
-            <div style={{ marginTop: 16, padding: 12, border: '1px solid #ddd', borderRadius: 6 }}>
+            <div className="refund-panel-active">
               <h4>Refund request for {activeBooking.movieTitle || activeBooking.movie?.title || 'booking'}</h4>
               <div style={{ marginBottom: 8 }}>
                 <label>Reason (optional)</label>
                 <div>
-                  <textarea value={reason} onChange={e => setReason(e.target.value)} rows={4} style={{ width: '100%' }} />
+                  <textarea value={reason} onChange={e => setReason(e.target.value)} rows={4} />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
