@@ -124,11 +124,10 @@ export function Navbar() {
         <Link href="/" className="cb-link">Home</Link>
         {user && (
           <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('bookings')} onMouseLeave={() => setCenterMenu(null)}>
-            <button className="cb-link" type="button">Bookings ▼</button>
+            <button className="cb-link" type="button">Bookings </button>
             {centerMenu === 'bookings' && (
               <div className="cb-dropdown-menu">
                 <Link href="/bookings" className="cb-dropdown-item">Booking History</Link>
-                <Link href="/bookings/review" className="cb-dropdown-item">Review</Link>
                 <Link href="/bookings/refund" className="cb-dropdown-item">Refund</Link>
               </div>
             )}
@@ -136,7 +135,7 @@ export function Navbar() {
         )}
         {user && (
           <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('branch')} onMouseLeave={() => setCenterMenu(null)}>
-            <button className="cb-link" type="button">Branch ▼</button>
+            <button className="cb-link" type="button">Branch </button>
             {centerMenu === 'branch' && (
                   <div className="cb-dropdown-menu">
                     <button className="cb-dropdown-item" type="button" onClick={() => handleSelectBranch('A')}>Branch A</button>
@@ -148,7 +147,7 @@ export function Navbar() {
         )}
         {canViewFunction && (
           <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('function')} onMouseLeave={() => setCenterMenu(null)}>
-            <button className="cb-link" type="button">Function ▼</button>
+            <button className="cb-link" type="button">Function </button>
             {centerMenu === 'function' && (
               <div className="cb-dropdown-menu">
                 <Link href="/profile/users" className="cb-dropdown-item">User Manage</Link>

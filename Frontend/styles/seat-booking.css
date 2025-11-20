@@ -137,6 +137,19 @@
   cursor: not-allowed;
 }
 
+/* Exclusive seats styling */
+.seat-button.exclusive.available {
+  background: #FDDC5C;
+  color: #1a1a1a;
+}
+.seat-button.exclusive.selected {
+  /* when selected, use a stronger border/scale but keep exclusive color */
+  background: #f9d86a;
+  color: #1a1a1a;
+  transform: scale(1.08);
+}
+
+
 .seat-legend {
   display: flex;
   flex-wrap: wrap;
@@ -167,6 +180,10 @@
 
 .legend-box.booked {
   background: rgba(239, 68, 68, 0.2);
+}
+
+.legend-box.exclusive {
+  background: #FDDC5C;
 }
 
 .legend-text {

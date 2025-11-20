@@ -9,6 +9,8 @@ import { toast } from '@/hooks/use-toast'
 
 const ROWS = ["A", "B", "C", "D", "E", "F"];
 const SEATS_PER_ROW = 8;
+const EXCLUSIVE_SEATS = ["E4", "E5", "F4", "F5"];
+const EXCLUSIVE_EXTRA = 50; // ฿50 extra per exclusive seat
 
 import { BACKEND_BASE } from "../lib/api";
 
@@ -59,8 +61,12 @@ export default function SeatBooking(props) {
     });
   }
 
-  // คำนวณราคารวมจากราคาตั๋วคูณจำนวนที่นั่ง
-  const totalPrice = selectedSeats.length * (movie.ticketPrice || 0);
+  // คำนวณราคารวมโดยคำนึงถึงที่นั่งพิเศษ (exclusive)
+  const totalPrice = selectedSeats.reduce((sum, id) => {
+    const base = Number(movie.ticketPrice || 0);
+    const extra = EXCLUSIVE_SEATS.includes(id) ? EXCLUSIVE_EXTRA : 0;
+    return sum + base + extra;
+  }, 0);
 
   async function confirmBooking() {
     if (selectedSeats.length === 0) {
@@ -84,8 +90,12 @@ export default function SeatBooking(props) {
       }
 
       // สร้าง draft booking ใน sessionStorage แทนการ POST ตอนนี้
+      // คำนวณราคาจริงรวมที่นั่งพิเศษ
       const ticketPrice = Number(movie.ticketPrice || 0);
-      const totalPrice = selectedSeats.length * ticketPrice;
+      const computedTotal = selectedSeats.reduce((s, id) => {
+        const extra = EXCLUSIVE_SEATS.includes(id) ? EXCLUSIVE_EXTRA : 0;
+        return s + ticketPrice + extra;
+      }, 0);
       // include branch the user is currently using (client-side preference or server-side value)
       let selectedBranch = 'A';
       try { selectedBranch = localStorage.getItem('selectedBranch') || 'A' } catch(e){ selectedBranch = 'A' }
@@ -106,7 +116,7 @@ export default function SeatBooking(props) {
         showtime: selectedShowtime,
         seats: selectedSeats,
         ticketPrice,
-        totalPrice,
+        totalPrice: computedTotal,
         branch: selectedBranch
       };
       sessionStorage.setItem("pendingBooking", JSON.stringify(draft));
@@ -166,7 +176,8 @@ export default function SeatBooking(props) {
                       const id = `${r}${col}`;
                       const isBooked = booked.includes(id);
                       const isSelected = selectedSeats.includes(id);
-                      let cls = "seat-button";
+                      const isExclusive = EXCLUSIVE_SEATS.includes(id);
+                      let cls = "seat-button" + (isExclusive ? " exclusive" : "");
                       if (isBooked) cls += " booked";
                       else if (isSelected) cls += " selected";
                       else cls += " available";
@@ -187,6 +198,7 @@ export default function SeatBooking(props) {
             <div className="legend-item"><span className="legend-box available" /> Available</div>
             <div className="legend-item"><span className="legend-box selected" /> Selected</div>
             <div className="legend-item"><span className="legend-box booked" /> Booked</div>
+            <div className="legend-item"><span className="legend-box exclusive" /> Exclusive (+฿50)</div>
           </div>
         </div>
 
