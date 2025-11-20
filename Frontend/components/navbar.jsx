@@ -176,7 +176,7 @@ export function Navbar() {
             </button>
 
             {profileMenuOpen && (
-              <div className="cb-menu" role="menu" style={{ position: "absolute", right: 0, marginTop: 8, background: "white", border: "1px solid #e6e6e6", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.08)", padding: 8, minWidth: 220 }}>
+              <div className="cb-menu" role="menu" style={{ position: "absolute", right: 0, marginTop: 8, background: "#1e293b", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 6, boxShadow: "0 6px 18px rgba(0,0,0,0.2)", padding: 8, minWidth: 220 }}>
                 <Link href="/profile" className="cb-menu-item" role="menuitem">Profile Home</Link>
                 <Link href="/profile/users" className="cb-menu-item" role="menuitem">User Panel</Link>
                 <Link href="/profile/statements" className="cb-menu-item" role="menuitem">Statements</Link>
