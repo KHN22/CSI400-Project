@@ -1,0 +1,61 @@
+/* Refund Panel Styles */
+.refund-panel {
+  background-color: #1e293b; /* Dark background */
+  color: #f8fafc; /* Light text */
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.refund-panel h2 {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+
+.refund-panel p {
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.refund-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.refund-panel li {
+  background: #2d3748;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.refund-panel button {
+  background-color: #4a5568;
+  color: #f8fafc;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refund-panel button:hover {
+  background-color: #2c5282;
+}
+
+.refund-panel textarea {
+  background-color: #2d3748;
+  color: #f8fafc;
+  border: 1px solid #4a5568;
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+}
+
+.refund-panel textarea:focus {
+  outline: none;
+  border-color: #63b3ed;
+}

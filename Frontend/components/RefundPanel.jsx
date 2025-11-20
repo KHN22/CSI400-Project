@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { bookingsApi, authApi, adminApi, requestsApi } from "@/lib/api";
+import '../styles/refund-panel.css';
 
 export default function RefundPanel() {
   const [bookings, setBookings] = useState([]);

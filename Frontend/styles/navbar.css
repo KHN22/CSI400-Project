@@ -204,3 +204,27 @@
 
 .cb-user-meta { gap: 6px; }
 
+/* Profile dropdown dark theme */
+.cb-menu {
+  background-color: #1e293b; /* Dark background */
+  color: #f8fafc; /* Light text */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  min-width: 220px;
+}
+
+.cb-menu-item {
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: #f8fafc;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s;
+}
+
+.cb-menu-item:hover {
+  background-color: #374151; /* Slightly lighter dark */
+}
+
