@@ -59,7 +59,7 @@ export function Navbar() {
   }, []);
 
   const canViewAdmin = ["SuperAdmin", "Manager"].includes(user?.role);
-  const canViewFunction = ["SuperAdmin", "Manager"].includes(user?.role);
+  const canViewFunction = ["SuperAdmin", "Manager", "Staff"].includes(user?.role);
   function formatBranch(b) {
     if (!b) return '';
     const s = String(b).trim();
@@ -133,7 +133,7 @@ export function Navbar() {
             )}
           </div>
         )}
-        {user && user.role === 'SuperAdmin' && (
+        {user && (user.role === 'SuperAdmin' || user.role === 'Guest') && (
           <div className="cb-dropdown" onMouseEnter={() => setCenterMenu('branch')} onMouseLeave={() => setCenterMenu(null)}>
             <button className="cb-link" type="button">Branch </button>
             {centerMenu === 'branch' && (
@@ -150,13 +150,31 @@ export function Navbar() {
             <button className="cb-link" type="button">Function </button>
             {centerMenu === 'function' && (
               <div className="cb-dropdown-menu">
-                <Link href="/profile/users" className="cb-dropdown-item">User Manage</Link>
-                <Link href="/profile/movies" className="cb-dropdown-item">Movie Manage</Link>
+                {/* SuperAdmin: full set; Manager: most items; Staff: only Movie Manage */}
                 {user && user.role === 'SuperAdmin' && (
-                  <Link href="/admin/auditlogs" className="cb-dropdown-item">Audit Logs</Link>
+                  <>
+                    <Link href="/profile/users" className="cb-dropdown-item">User Manage</Link>
+                    <Link href="/profile/movies" className="cb-dropdown-item">Movie Manage</Link>
+                    <Link href="/admin/auditlogs" className="cb-dropdown-item">Audit Logs</Link>
+                    <Link href="/profile/requests" className="cb-dropdown-item">Requests</Link>
+                    <Link href="/profile/statements" className="cb-dropdown-item">Statements</Link>
+                  </>
                 )}
-                <Link href="/profile/requests" className="cb-dropdown-item">Requests</Link>
-                <Link href="/profile/statements" className="cb-dropdown-item">Statements</Link>
+
+                {user && user.role === 'Manager' && (
+                  <>
+                    <Link href="/profile/users" className="cb-dropdown-item">User Manage</Link>
+                    <Link href="/profile/movies" className="cb-dropdown-item">Movie Manage</Link>
+                    <Link href="/profile/requests" className="cb-dropdown-item">Requests</Link>
+                    <Link href="/profile/statements" className="cb-dropdown-item">Statements</Link>
+                  </>
+                )}
+
+                {user && user.role === 'Staff' && (
+                  <>
+                    <Link href="/profile/movies" className="cb-dropdown-item">Movie Manage</Link>
+                  </>
+                )}
               </div>
             )}
           </div>

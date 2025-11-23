@@ -24,6 +24,11 @@ export default function MoviesPanel() {
 
   useEffect(() => { loadMovies(); }, []);
 
+  // reload movies when current user is known so Staff/Manager see their branch-only list
+  useEffect(() => {
+    if (me) loadMovies();
+  }, [me]);
+
   useEffect(() => {
     let mounted = true;
     async function loadMe() {
@@ -41,7 +46,13 @@ export default function MoviesPanel() {
   async function loadMovies() {
     setMLoading(true); setMError("");
     try {
-      const res = await fetch(`${BACKEND_BASE}/api/movies`);
+      let url = `${BACKEND_BASE}/api/movies`;
+      // if logged-in and role is Manager/Staff, request branch-scoped movies
+      if (me && (me.role === 'Manager' || me.role === 'Staff')) {
+        const b = me.branch || 'A';
+        url += `?branch=${encodeURIComponent(b)}`;
+      }
+      const res = await fetch(url, { credentials: me ? 'include' : 'omit' });
       if (!res.ok) throw new Error('Failed to load movies');
       const d = await res.json().catch(()=>null);
       const list = Array.isArray(d) ? d : (d?.movies || []);
