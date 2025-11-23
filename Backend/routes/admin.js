@@ -32,7 +32,7 @@ function requireAdmin(req, res, next) {
  *         description: List of users
  */
 // GET /api/admin/users?q=search
-router.get('/users', requireAdmin, async (req, res) => {
+router.get('/users', verifyToken, async (req, res) => {
   try {
     const q = (req.query.q || '').trim();
     let filter = {};
@@ -40,8 +40,23 @@ router.get('/users', requireAdmin, async (req, res) => {
       const re = new RegExp(q, 'i');
       filter = { $or: [{ email: re }, { username: re }] };
     }
-    const users = await User.find(filter).select('_id email username role branch createdAt updatedAt').sort({ createdAt: -1 });
-    return res.json({ users });
+
+    // SuperAdmin: full list
+    if (req.user && req.user.role === 'SuperAdmin') {
+      const users = await User.find(filter).select('_id email username role branch createdAt updatedAt').sort({ createdAt: -1 });
+      return res.json({ users });
+    }
+
+    // Manager: limited to Staff in the same branch
+    if (req.user && req.user.role === 'Manager') {
+      if (!req.user.branch) return res.status(403).json({ message: 'Manager has no branch' });
+      // only show Staff in the manager's branch
+      filter = { ...filter, role: 'Staff', branch: req.user.branch };
+      const users = await User.find(filter).select('_id email username role branch createdAt updatedAt').sort({ createdAt: -1 });
+      return res.json({ users });
+    }
+
+    return res.status(403).json({ message: 'forbidden' });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'server error' });
@@ -78,7 +93,7 @@ router.get('/users', requireAdmin, async (req, res) => {
  *         description: Role updated
  */
 // PATCH /api/admin/users/:id/role  { role: "Guest"|"Staff"|"Manager"|"SuperAdmin" }
-router.patch('/users/:id/role', requireAdmin, async (req, res) => {
+router.patch('/users/:id/role', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { role } = req.body;
@@ -88,9 +103,24 @@ router.patch('/users/:id/role', requireAdmin, async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'user not found' });
 
-    user.role = role;
-    await user.save();
-    return res.json({ message: 'role updated', user: { _id: user._id, email: user.email, username: user.username, role: user.role } });
+    // SuperAdmin may change any role
+    if (req.user && req.user.role === 'SuperAdmin') {
+      user.role = role;
+      await user.save();
+      return res.json({ message: 'role updated', user: { _id: user._id, email: user.email, username: user.username, role: user.role } });
+    }
+
+    // Manager may only assign 'Staff' and only for users in their branch
+    if (req.user && req.user.role === 'Manager') {
+      if (role !== 'Staff') return res.status(403).json({ message: 'Managers can only assign Staff role' });
+      if (!req.user.branch) return res.status(403).json({ message: 'Manager has no branch' });
+      if (String(user.branch) !== String(req.user.branch)) return res.status(403).json({ message: 'Managers may only manage users in their branch' });
+      user.role = 'Staff';
+      await user.save();
+      return res.json({ message: 'role updated', user: { _id: user._id, email: user.email, username: user.username, role: user.role } });
+    }
+
+    return res.status(403).json({ message: 'forbidden' });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'server error' });
