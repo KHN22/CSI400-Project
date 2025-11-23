@@ -9,10 +9,32 @@ export function MovieGrid() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [me, setMe] = useState(null);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadMe() {
+      try {
+        const r = await fetch(`${BACKEND_BASE}/api/auth/me`, { credentials: 'include' });
+        if (!mounted) return;
+        if (r.ok) {
+          const p = await r.json().catch(() => null);
+          const u = p?.user || p || null;
+          setMe(u);
+        } else {
+          setMe(null);
+        }
+      } catch (e) {
+        if (mounted) setMe(null);
+      }
+    }
+    loadMe();
+    return () => { mounted = false };
+  }, []);
       setLoading(true);
       setErr("");
       try {
@@ -73,9 +95,15 @@ export function MovieGrid() {
     return (
       <div className="card">
         <div>No movies available.</div>
-        <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
-          Add movies in <a href="/admin" style={{ textDecoration: "underline" }}>/admin</a>
-        </div>
+        {me && ['SuperAdmin','Manager','Staff'].includes(me.role) ? (
+          <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
+            Add movies in <a href="/admin" style={{ textDecoration: "underline" }}>/admin</a>
+          </div>
+        ) : (
+          <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
+            Movies are not available. Contact an administrator to add movies.
+          </div>
+        )}
       </div>
     );
   }
