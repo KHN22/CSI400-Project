@@ -10,11 +10,7 @@ export function MovieGrid() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [me, setMe] = useState(null);
-
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-
+  // load current user (me) separately
   useEffect(() => {
     let mounted = true;
     async function loadMe() {
@@ -35,8 +31,11 @@ export function MovieGrid() {
     loadMe();
     return () => { mounted = false };
   }, []);
-      setLoading(true);
-      setErr("");
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setLoading(true); setErr("");
       try {
         // Determine selected branch: prefer localStorage, fall back to user's branch from /api/auth/me
         let selectedBranch = 'A';
