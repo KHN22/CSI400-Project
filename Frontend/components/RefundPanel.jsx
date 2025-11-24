@@ -4,7 +4,7 @@ import { bookingsApi, authApi, adminApi, requestsApi } from "@/lib/api";
 import '../styles/refund-panel.css';
 
 // Refund window: minutes before showtime when refunds close
-const REFUND_WINDOW_MINUTES = 60;
+const REFUND_WINDOW_MINUTES = 30;
 
 export default function RefundPanel() {
   const [bookings, setBookings] = useState([]);
@@ -146,15 +146,37 @@ export default function RefundPanel() {
 function parseShowtime(booking) {
   // booking may have separate date and showtime (mock-data), or showtime as ISO
   try {
+    // If both date and showtime provided, try combining them first
     if (booking.date && booking.showtime) {
-      // Try: '2025-10-15' + '8:30 PM' -> '2025-10-15 20:30'
       const dt = new Date(`${booking.date} ${booking.showtime}`);
       if (!isNaN(dt.getTime())) return dt;
     }
-    // if booking.showtime looks like ISO
+
+    // If showtime is present, try parsing as ISO or as time-only combined with a base date
     if (booking.showtime) {
-      const dt = new Date(booking.showtime);
-      if (!isNaN(dt.getTime())) return dt;
+      // ISO or full datetime
+      const dtIso = new Date(booking.showtime);
+      if (!isNaN(dtIso.getTime())) return dtIso;
+
+      // time-only formats like '20:30' or '8:30 PM'
+      const timeOnly = /^[0-9]{1,2}:[0-9]{2}(\s?(AM|PM|am|pm))?$/;
+      if (typeof booking.showtime === 'string' && timeOnly.test(booking.showtime.trim())) {
+        // determine base date: booking.date || createdAt's date
+        let baseDate = null;
+        if (booking.date) baseDate = booking.date;
+        else if (booking.createdAt) {
+          try { baseDate = new Date(booking.createdAt).toISOString().slice(0,10); } catch(e) { baseDate = null; }
+        }
+        if (baseDate) {
+          const dt = new Date(`${baseDate} ${booking.showtime}`);
+          if (!isNaN(dt.getTime())) return dt;
+        }
+      }
+      // numeric timestamp?
+      if (!isNaN(Number(booking.showtime))) {
+        const dtn = new Date(Number(booking.showtime));
+        if (!isNaN(dtn.getTime())) return dtn;
+      }
     }
     // fallback to createdAt
     if (booking.createdAt) {
